@@ -166,10 +166,10 @@ const RequestForm = () => {
                       mode="single"
                       selected={date.to}
                       onSelect={(day) => setDate({ ...date, to: day })}
-                      disabled={(date) => {
-                        // Comprueba si date.from existe antes de usar addDays
+                      disabled={(currentDate) => {
+                        // Corrigiendo: usando la referencia correcta al estado 'date.from'
                         const minDate = date.from ? addDays(date.from, 0) : new Date();
-                        return date < minDate;
+                        return currentDate < minDate;
                       }}
                       locale={es}
                       initialFocus
