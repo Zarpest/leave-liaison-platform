@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ import {
 import { CalendarIcon, Clock10Icon } from "lucide-react";
 import { format, differenceInBusinessDays, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { SlideIn } from "@/components/animations/Transitions";
 
 const leaveTypes = [
@@ -48,6 +49,7 @@ const RequestForm = () => {
   const [leaveType, setLeaveType] = useState<string>("");
   const [reason, setReason] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { toast } = useToast();
 
   const businessDays = React.useMemo(() => {
     if (date.from && date.to) {
@@ -60,7 +62,11 @@ const RequestForm = () => {
     e.preventDefault();
     
     if (!date.from || !date.to || !leaveType) {
-      toast.error("Please fill in all required fields");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all required fields"
+      });
       return;
     }
     
@@ -68,7 +74,10 @@ const RequestForm = () => {
     
     // Simulate API call
     setTimeout(() => {
-      toast.success("Leave request submitted successfully");
+      toast({
+        title: "Success",
+        description: "Leave request submitted successfully"
+      });
       setIsSubmitting(false);
       
       // Reset form

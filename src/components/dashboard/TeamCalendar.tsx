@@ -127,18 +127,26 @@ const TeamCalendar = () => {
                 selected={date}
                 onSelect={(newDate) => newDate && setDate(newDate)}
                 className="rounded-md border max-w-full"
-                styles={{
-                  day_today: { 
-                    borderColor: 'var(--primary)' 
-                  },
-                  day_selected: { 
-                    backgroundColor: 'hsl(var(--primary))',
-                    color: 'white'
-                  },
-                  day: date => dayStyles(date) // Fixed: Correctly call the dayStyles function
+                modifiers={{
+                  highlight: (date) => {
+                    return teamMembers.some(member => 
+                      member.leaves.some(leave => 
+                        (date >= leave.startDate && date <= leave.endDate)
+                      )
+                    );
+                  }
+                }}
+                modifiersStyles={{
+                  highlight: {
+                    backgroundColor: "hsl(var(--primary) / 0.15)",
+                    color: "hsl(var(--primary))",
+                    fontWeight: "500",
+                    borderRadius: "9999px"
+                  }
                 }}
               />
             </div>
+            
             <div className="md:col-span-4">
               <div className="mb-4">
                 <h3 className="text-sm font-medium text-muted-foreground">

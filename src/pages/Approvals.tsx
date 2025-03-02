@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { CheckIcon, FilterIcon, XIcon } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
 // Sample pending requests data
@@ -66,15 +66,22 @@ const pendingRequests = [
 
 const Approvals = () => {
   const [requests, setRequests] = React.useState(pendingRequests);
+  const { toast } = useToast();
 
   const handleApprove = (id: string) => {
     setRequests(requests.filter((request) => request.id !== id));
-    toast.success("Request approved successfully");
+    toast({
+      title: "Success",
+      description: "Request approved successfully"
+    });
   };
 
   const handleReject = (id: string) => {
     setRequests(requests.filter((request) => request.id !== id));
-    toast.success("Request rejected successfully");
+    toast({
+      title: "Success",
+      description: "Request rejected successfully"
+    });
   };
 
   return (
