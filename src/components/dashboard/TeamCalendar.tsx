@@ -135,7 +135,7 @@ const TeamCalendar = () => {
                     backgroundColor: 'hsl(var(--primary))',
                     color: 'white'
                   },
-                  day: (date) => dayStyles(date) || {}
+                  day: date => dayStyles(date) // Fixed: Correctly call the dayStyles function
                 }}
               />
             </div>

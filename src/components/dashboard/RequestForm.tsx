@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,7 @@ import {
 import { CalendarIcon, Clock10Icon } from "lucide-react";
 import { format, differenceInBusinessDays, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-toast";
 import { SlideIn } from "@/components/animations/Transitions";
 
 const leaveTypes = [
@@ -151,9 +150,9 @@ const RequestForm = () => {
                       mode="single"
                       selected={date.to}
                       onSelect={(day) => setDate({ ...date, to: day })}
-                      disabled={(date) => (
-                        date < (date.from ? addDays(date.from, 0) : new Date())
-                      )}
+                      disabled={(date) => {
+                        return date < (date.from ? addDays(date.from, 0) : new Date());
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
