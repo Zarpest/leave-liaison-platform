@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   CalendarIcon,
@@ -10,6 +10,8 @@ import {
   LogOutIcon,
   SettingsIcon,
   XIcon,
+  FileTextIcon,
+  UsersIcon
 } from "lucide-react";
 import {
   Sheet,
@@ -26,16 +28,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => setIsOpen(!isOpen);
   const closeMobileMenu = () => setIsOpen(false);
 
   // Creamos una URL directa a la imagen para asegurarnos de que se cargue correctamente
   const logoUrl = "/lovable-uploads/educo-logo.png";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-sm">
@@ -78,32 +88,45 @@ const Navbar = () => {
               <Button variant="ghost" className="p-0 h-8 w-8 rounded-full">
                 <Avatar>
                   <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarFallback>
+                    {user?.name ? user.name.substring(0, 2).toUpperCase() : "UN"}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">Juan Pérez</p>
-                  <p className="text-xs text-muted-foreground">juan.perez@educo.org</p>
+                  <p className="text-sm font-medium">{user?.name || "Usuario"}</p>
+                  <p className="text-xs text-muted-foreground">{user?.email || "usuario@educo.org"}</p>
+                  {user?.department && (
+                    <p className="text-xs text-muted-foreground">{user.department}</p>
+                  )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/")}>
+                <HomeIcon className="mr-2 h-4 w-4" />
+                <span>Panel Principal</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/requests")}>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                <span>Mis Solicitudes</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/team")}>
+                <UsersIcon className="mr-2 h-4 w-4" />
+                <span>Calendario de Equipo</span>
+              </DropdownMenuItem>
               <DropdownMenuItem>
                 <User2Icon className="mr-2 h-4 w-4" />
                 <span>Perfil</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                <span>Mis Solicitudes</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <SettingsIcon className="mr-2 h-4 w-4" />
                 <span>Configuración</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOutIcon className="mr-2 h-4 w-4" />
                 <span>Cerrar sesión</span>
               </DropdownMenuItem>
@@ -128,13 +151,24 @@ const Navbar = () => {
                     Mis Solicitudes
                   </Link>
                   <Link to="/team" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
-                    <User2Icon className="h-5 w-5" />
+                    <UsersIcon className="h-5 w-5" />
                     Calendario de Equipo
                   </Link>
                   <Link to="/approvals" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
-                    <SettingsIcon className="h-5 w-5" />
+                    <FileTextIcon className="h-5 w-5" />
                     Aprobaciones
                   </Link>
+                  <div className="border-t my-2"></div>
+                  <button 
+                    className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition text-left" 
+                    onClick={() => {
+                      closeMobileMenu();
+                      handleLogout();
+                    }}
+                  >
+                    <LogOutIcon className="h-5 w-5" />
+                    Cerrar sesión
+                  </button>
                 </nav>
               </SheetContent>
             </Sheet>
