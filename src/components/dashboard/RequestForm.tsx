@@ -25,16 +25,17 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon, Clock10Icon } from "lucide-react";
 import { format, differenceInBusinessDays, addDays } from "date-fns";
+import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { SlideIn } from "@/components/animations/Transitions";
 
 const leaveTypes = [
-  { value: "vacation", label: "Vacation Leave" },
-  { value: "sick", label: "Sick Leave" },
-  { value: "personal", label: "Personal Leave" },
-  { value: "bereavement", label: "Bereavement" },
-  { value: "parental", label: "Parental Leave" },
+  { value: "vacation", label: "Vacaciones" },
+  { value: "sick", label: "Permiso por Enfermedad" },
+  { value: "personal", label: "Permiso Personal" },
+  { value: "bereavement", label: "Permiso por Duelo" },
+  { value: "parental", label: "Permiso Parental" },
 ];
 
 const RequestForm = () => {
@@ -65,26 +66,31 @@ const RequestForm = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please fill in all required fields"
+        description: "Por favor, completa todos los campos requeridos"
       });
       return;
     }
     
     setIsSubmitting(true);
     
-    // Simulate API call
+    // Simular llamada a API
     setTimeout(() => {
       toast({
-        title: "Success",
-        description: "Leave request submitted successfully"
+        title: "Éxito",
+        description: "Solicitud de permiso enviada correctamente"
       });
       setIsSubmitting(false);
       
-      // Reset form
+      // Resetear formulario
       setDate({ from: undefined, to: undefined });
       setLeaveType("");
       setReason("");
     }, 1500);
+  };
+
+  // Función para formatear fechas en español
+  const formatDate = (date: Date) => {
+    return format(date, "d MMM yyyy", { locale: es });
   };
 
   return (
@@ -92,17 +98,17 @@ const RequestForm = () => {
       <form onSubmit={handleSubmit}>
         <Card className="card-hover">
           <CardHeader>
-            <CardTitle className="text-xl">Request Leave</CardTitle>
+            <CardTitle className="text-xl">Solicitar Permiso</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="leave-type">Leave Type</Label>
+              <Label htmlFor="leave-type">Tipo de Permiso</Label>
               <Select
                 value={leaveType}
                 onValueChange={setLeaveType}
               >
                 <SelectTrigger id="leave-type" className="w-full">
-                  <SelectValue placeholder="Select leave type" />
+                  <SelectValue placeholder="Selecciona tipo de permiso" />
                 </SelectTrigger>
                 <SelectContent>
                   {leaveTypes.map((type) => (
@@ -115,7 +121,7 @@ const RequestForm = () => {
             </div>
 
             <div className="space-y-2">
-              <Label>Date Range</Label>
+              <Label>Rango de Fechas</Label>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -127,7 +133,7 @@ const RequestForm = () => {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date.from ? format(date.from, "PPP") : "Start date"}
+                      {date.from ? formatDate(date.from) : "Fecha inicio"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -135,6 +141,7 @@ const RequestForm = () => {
                       mode="single"
                       selected={date.from}
                       onSelect={(day) => setDate({ ...date, from: day })}
+                      locale={es}
                       initialFocus
                     />
                   </PopoverContent>
@@ -151,7 +158,7 @@ const RequestForm = () => {
                       disabled={!date.from}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date.to ? format(date.to, "PPP") : "End date"}
+                      {date.to ? formatDate(date.to) : "Fecha fin"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -160,8 +167,11 @@ const RequestForm = () => {
                       selected={date.to}
                       onSelect={(day) => setDate({ ...date, to: day })}
                       disabled={(date) => {
-                        return date < (date.from ? addDays(date.from, 0) : new Date());
+                        // Comprueba si date.from existe antes de usar addDays
+                        const minDate = date.from ? addDays(date.from, 0) : new Date();
+                        return date < minDate;
                       }}
+                      locale={es}
                       initialFocus
                     />
                   </PopoverContent>
@@ -171,25 +181,25 @@ const RequestForm = () => {
               {businessDays > 0 && (
                 <div className="mt-2 flex items-center text-sm text-muted-foreground">
                   <Clock10Icon className="h-4 w-4 mr-1" />
-                  <span>{businessDays} business day{businessDays !== 1 ? 's' : ''}</span>
+                  <span>{businessDays} día{businessDays !== 1 ? 's' : ''} laborable{businessDays !== 1 ? 's' : ''}</span>
                 </div>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reason">Reason (Optional)</Label>
+              <Label htmlFor="reason">Motivo (Opcional)</Label>
               <Textarea
                 id="reason"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="Enter details about your leave request"
+                placeholder="Ingresa detalles sobre tu solicitud de permiso"
                 className="min-h-[100px]"
               />
             </div>
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit Request"}
+              {isSubmitting ? "Enviando..." : "Enviar Solicitud"}
             </Button>
           </CardFooter>
         </Card>

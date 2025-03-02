@@ -23,44 +23,45 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { CheckIcon, FilterIcon, XIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
-// Sample pending requests data
+// Datos de ejemplo de solicitudes pendientes
 const pendingRequests = [
   {
     id: "1",
-    employeeName: "John Smith",
+    employeeName: "Juan García",
     employeeAvatar: "https://github.com/shadcn.png",
-    employeeInitials: "JS",
-    type: "Vacation Leave",
+    employeeInitials: "JG",
+    type: "Vacaciones",
     startDate: new Date("2024-06-10"),
     endDate: new Date("2024-06-15"),
     days: 5,
     requestedOn: new Date("2024-05-20"),
-    reason: "Family vacation",
+    reason: "Vacaciones familiares",
   },
   {
     id: "2",
-    employeeName: "Emily Johnson",
+    employeeName: "María Rodríguez",
     employeeAvatar: "",
-    employeeInitials: "EJ",
-    type: "Sick Leave",
+    employeeInitials: "MR",
+    type: "Permiso por Enfermedad",
     startDate: new Date("2024-05-25"),
     endDate: new Date("2024-05-26"),
     days: 2,
     requestedOn: new Date("2024-05-24"),
-    reason: "Not feeling well",
+    reason: "No me encuentro bien",
   },
   {
     id: "3",
-    employeeName: "David Wilson",
+    employeeName: "David Sánchez",
     employeeAvatar: "",
-    employeeInitials: "DW",
-    type: "Personal Leave",
+    employeeInitials: "DS",
+    type: "Permiso Personal",
     startDate: new Date("2024-06-01"),
     endDate: new Date("2024-06-01"),
     days: 1,
     requestedOn: new Date("2024-05-22"),
-    reason: "Appointment",
+    reason: "Cita médica",
   },
 ];
 
@@ -71,17 +72,22 @@ const Approvals = () => {
   const handleApprove = (id: string) => {
     setRequests(requests.filter((request) => request.id !== id));
     toast({
-      title: "Success",
-      description: "Request approved successfully"
+      title: "Éxito",
+      description: "Solicitud aprobada correctamente"
     });
   };
 
   const handleReject = (id: string) => {
     setRequests(requests.filter((request) => request.id !== id));
     toast({
-      title: "Success",
-      description: "Request rejected successfully"
+      title: "Éxito",
+      description: "Solicitud rechazada correctamente"
     });
+  };
+
+  // Función para formatear fechas en español
+  const formatDate = (date: Date) => {
+    return format(date, "d MMM yyyy", { locale: es });
   };
 
   return (
@@ -89,23 +95,23 @@ const Approvals = () => {
       <PageTransition>
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Approvals</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Aprobaciones</h1>
             <p className="text-muted-foreground mt-1">
-              Manage pending leave requests from your team
+              Gestiona las solicitudes de permisos pendientes de tu equipo
             </p>
           </div>
 
           <Card className="card-hover">
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
               <div>
-                <CardTitle className="text-xl">Pending Requests</CardTitle>
+                <CardTitle className="text-xl">Solicitudes Pendientes</CardTitle>
                 <CardDescription>
-                  {requests.length} request{requests.length !== 1 ? "s" : ""} awaiting your approval
+                  {requests.length} solicitud{requests.length !== 1 ? "es" : ""} esperando tu aprobación
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm">
                 <FilterIcon className="h-4 w-4 mr-1" />
-                Filter
+                Filtrar
               </Button>
             </CardHeader>
             <CardContent>
@@ -114,12 +120,12 @@ const Approvals = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Employee</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="text-center">Days</TableHead>
-                        <TableHead>Requested</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>Empleado</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Fecha</TableHead>
+                        <TableHead className="text-center">Días</TableHead>
+                        <TableHead>Solicitado</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -143,14 +149,14 @@ const Approvals = () => {
                           </TableCell>
                           <TableCell>{request.type}</TableCell>
                           <TableCell>
-                            {format(request.startDate, "MMM d, yyyy")}
+                            {formatDate(request.startDate)}
                             {!request.startDate.toDateString().includes(request.endDate.toDateString()) && (
-                              <span> - {format(request.endDate, "MMM d, yyyy")}</span>
+                              <span> - {formatDate(request.endDate)}</span>
                             )}
                           </TableCell>
                           <TableCell className="text-center">{request.days}</TableCell>
                           <TableCell>
-                            {format(request.requestedOn, "MMM d, yyyy")}
+                            {formatDate(request.requestedOn)}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
@@ -180,7 +186,7 @@ const Approvals = () => {
               ) : (
                 <div className="py-12 text-center border rounded-md">
                   <p className="text-muted-foreground">
-                    No pending requests to approve
+                    No hay solicitudes pendientes para aprobar
                   </p>
                 </div>
               )}

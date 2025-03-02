@@ -39,24 +39,28 @@ const Navbar = () => {
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
-            <CalendarIcon className="h-6 w-6 text-primary" />
-            <span className="text-lg font-semibold">Leave Platform</span>
+            <img 
+              src="/lovable-uploads/educo-logo.png" 
+              alt="Educo" 
+              className="h-8" 
+            />
+            <span className="text-lg font-semibold hidden md:inline">Plataforma de Permisos</span>
           </Link>
         </div>
 
         {!isMobile && (
           <nav className="flex items-center gap-6 mx-6">
             <Link to="/" className="text-sm font-medium hover:text-primary btn-transition">
-              Dashboard
+              Panel Principal
             </Link>
             <Link to="/requests" className="text-sm font-medium hover:text-primary btn-transition">
-              My Requests
+              Mis Solicitudes
             </Link>
             <Link to="/team" className="text-sm font-medium hover:text-primary btn-transition">
-              Team Calendar
+              Calendario de Equipo
             </Link>
             <Link to="/approvals" className="text-sm font-medium hover:text-primary btn-transition">
-              Approvals
+              Aprobaciones
             </Link>
           </nav>
         )}
@@ -78,27 +82,27 @@ const Navbar = () => {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-muted-foreground">john.doe@example.com</p>
+                  <p className="text-sm font-medium">Juan Pérez</p>
+                  <p className="text-xs text-muted-foreground">juan.perez@educo.org</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User2Icon className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>Perfil</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                <span>My Requests</span>
+                <span>Mis Solicitudes</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <SettingsIcon className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+                <span>Configuración</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LogOutIcon className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Cerrar sesión</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -114,19 +118,19 @@ const Navbar = () => {
                 <nav className="flex flex-col gap-4 mt-8">
                   <Link to="/" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
                     <HomeIcon className="h-5 w-5" />
-                    Dashboard
+                    Panel Principal
                   </Link>
                   <Link to="/requests" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
                     <CalendarIcon className="h-5 w-5" />
-                    My Requests
+                    Mis Solicitudes
                   </Link>
                   <Link to="/team" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
                     <User2Icon className="h-5 w-5" />
-                    Team Calendar
+                    Calendario de Equipo
                   </Link>
                   <Link to="/approvals" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
                     <SettingsIcon className="h-5 w-5" />
-                    Approvals
+                    Aprobaciones
                   </Link>
                 </nav>
               </SheetContent>
