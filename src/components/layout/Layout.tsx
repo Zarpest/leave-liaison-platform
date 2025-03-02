@@ -20,17 +20,17 @@ const Layout = ({ children, className }: LayoutProps) => {
       <footer className="py-6 px-4 sm:px-6 md:px-8 border-t border-border bg-muted/30">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            Leave Management Platform © {new Date().getFullYear()}
+            Plataforma de Gestión de Permisos © {new Date().getFullYear()}
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground btn-transition">
-              Privacy
+              Privacidad
             </a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground btn-transition">
-              Terms
+              Términos
             </a>
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground btn-transition">
-              Support
+              Soporte
             </a>
           </div>
         </div>

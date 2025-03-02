@@ -34,13 +34,16 @@ const Navbar = () => {
   const toggleMobileMenu = () => setIsOpen(!isOpen);
   const closeMobileMenu = () => setIsOpen(false);
 
+  // Creamos una URL directa a la imagen para asegurarnos de que se cargue correctamente
+  const logoUrl = "/lovable-uploads/educo-logo.png";
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
             <img 
-              src="/lovable-uploads/educo-logo.png" 
+              src={logoUrl}
               alt="Educo" 
               className="h-8" 
             />
