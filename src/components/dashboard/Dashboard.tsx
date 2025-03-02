@@ -10,31 +10,31 @@ const Dashboard = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Panel Principal</h1>
         <p className="text-muted-foreground mt-1">
-          Manage your time off and view team availability
+          Gestiona tus permisos y consulta la disponibilidad del equipo
         </p>
       </div>
 
       <StaggerChildren>
         <div className="grid gap-6 md:grid-cols-3">
           <LeaveBalanceCard
-            title="Vacation Leave"
+            title="Vacaciones"
             total={20}
             used={8}
-            description="Annual vacation days reset on January 1st"
+            description="Los días de vacaciones anuales se reinician el 1 de enero"
           />
           <LeaveBalanceCard
-            title="Sick Leave"
+            title="Permiso por Enfermedad"
             total={12}
             used={2}
-            description="Sick leave balance for the current year"
+            description="Balance de permisos por enfermedad para el año actual"
           />
           <LeaveBalanceCard
-            title="Personal Time"
+            title="Tiempo Personal"
             total={24}
             used={10}
-            description="Hours available for personal time"
+            description="Horas disponibles para tiempo personal"
           />
         </div>
 

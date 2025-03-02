@@ -36,12 +36,12 @@ const LeaveBalanceCard = ({
           <div className="space-y-4">
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-bold">{remaining}</span>
-              <span className="text-sm text-muted-foreground">of {total} days</span>
+              <span className="text-sm text-muted-foreground">de {total} días</span>
             </div>
             <Progress value={percentUsed} className="h-2" />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Used: {used} days</span>
-              <span>Remaining: {remaining} days</span>
+              <span>Usados: {used} días</span>
+              <span>Restantes: {remaining} días</span>
             </div>
             {description && (
               <p className="text-sm text-muted-foreground">{description}</p>
@@ -53,7 +53,7 @@ const LeaveBalanceCard = ({
             href="#" 
             className="text-xs text-primary flex items-center group"
           >
-            View History
+            Ver Historial
             <ArrowRightIcon className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
           </a>
         </CardFooter>

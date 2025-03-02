@@ -10,9 +10,9 @@ const Requests = () => {
       <PageTransition>
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">My Requests</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Mis Solicitudes</h1>
             <p className="text-muted-foreground mt-1">
-              View and manage all your leave requests
+              Ver y gestionar todas tus solicitudes de permisos
             </p>
           </div>
           

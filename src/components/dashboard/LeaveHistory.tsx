@@ -19,13 +19,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowRightIcon, FilterIcon, SortAscIcon } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { FadeIn } from "@/components/animations/Transitions";
 
-// Sample data
+// Datos de ejemplo
 const leaveRequests = [
   {
     id: "1",
-    type: "Vacation Leave",
+    type: "Vacaciones",
     startDate: new Date("2023-12-10"),
     endDate: new Date("2023-12-15"),
     days: 5,
@@ -34,7 +35,7 @@ const leaveRequests = [
   },
   {
     id: "2",
-    type: "Sick Leave",
+    type: "Permiso por Enfermedad",
     startDate: new Date("2024-01-05"),
     endDate: new Date("2024-01-06"),
     days: 2,
@@ -43,7 +44,7 @@ const leaveRequests = [
   },
   {
     id: "3",
-    type: "Personal Leave",
+    type: "Permiso Personal",
     startDate: new Date("2024-05-20"),
     endDate: new Date("2024-05-20"),
     days: 1,
@@ -52,7 +53,7 @@ const leaveRequests = [
   },
   {
     id: "4",
-    type: "Bereavement",
+    type: "Permiso por Duelo",
     startDate: new Date("2024-03-10"),
     endDate: new Date("2024-03-13"),
     days: 4,
@@ -67,17 +68,17 @@ const LeaveHistory = () => {
       <Card className="card-hover">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div>
-            <CardTitle className="text-xl">Recent Requests</CardTitle>
-            <CardDescription>View your recent leave requests</CardDescription>
+            <CardTitle className="text-xl">Solicitudes Recientes</CardTitle>
+            <CardDescription>Ver tus solicitudes de permisos recientes</CardDescription>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="h-8">
               <FilterIcon className="h-4 w-4 mr-1" />
-              Filter
+              Filtrar
             </Button>
             <Button variant="outline" size="sm" className="h-8">
               <SortAscIcon className="h-4 w-4 mr-1" />
-              Sort
+              Ordenar
             </Button>
           </div>
         </CardHeader>
@@ -86,11 +87,11 @@ const LeaveHistory = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[180px]">Type</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-center">Days</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead className="text-right">Requested On</TableHead>
+                  <TableHead className="w-[180px]">Tipo</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead className="text-center">Días</TableHead>
+                  <TableHead className="text-center">Estado</TableHead>
+                  <TableHead className="text-right">Solicitado el</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -98,9 +99,9 @@ const LeaveHistory = () => {
                   <TableRow key={request.id} className="hover:bg-muted/40">
                     <TableCell className="font-medium">{request.type}</TableCell>
                     <TableCell>
-                      {format(request.startDate, "MMM d, yyyy")}
+                      {format(request.startDate, "d MMM yyyy", { locale: es })}
                       {!request.startDate.toDateString().includes(request.endDate.toDateString()) && (
-                        <span> - {format(request.endDate, "MMM d, yyyy")}</span>
+                        <span> - {format(request.endDate, "d MMM yyyy", { locale: es })}</span>
                       )}
                     </TableCell>
                     <TableCell className="text-center">{request.days}</TableCell>
@@ -108,7 +109,7 @@ const LeaveHistory = () => {
                       <StatusBadge status={request.status as any} />
                     </TableCell>
                     <TableCell className="text-right">
-                      {format(request.requestedOn, "MMM d, yyyy")}
+                      {format(request.requestedOn, "d MMM yyyy", { locale: es })}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -117,7 +118,7 @@ const LeaveHistory = () => {
           </div>
           <div className="flex justify-center mt-4">
             <Button variant="outline" size="sm" className="text-xs group">
-              View All Requests
+              Ver Todas las Solicitudes
               <ArrowRightIcon className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>

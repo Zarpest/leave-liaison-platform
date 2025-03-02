@@ -10,9 +10,9 @@ const TeamPage = () => {
       <PageTransition>
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Team Calendar</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Calendario del Equipo</h1>
             <p className="text-muted-foreground mt-1">
-              View your team's leave schedule and availability
+              Consulta los permisos y disponibilidad de tu equipo
             </p>
           </div>
           
