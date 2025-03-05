@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Requests from "./pages/Requests";
 import TeamPage from "./pages/TeamPage";
 import Approvals from "./pages/Approvals";
+import AdminPanel from "./pages/AdminPanel";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/requests/:id" element={<RequireAuth><DetailedHistory /></RequireAuth>} />
             <Route path="/team" element={<RequireAuth><TeamPage /></RequireAuth>} />
             <Route path="/approvals" element={<RequireAuth><Approvals /></RequireAuth>} />
+            <Route path="/admin" element={<RequireAuth><AdminPanel /></RequireAuth>} />
             
             {/* Ruta no encontrada */}
             <Route path="*" element={<NotFound />} />

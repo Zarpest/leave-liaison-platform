@@ -7,6 +7,7 @@ export interface User {
   name: string;
   email: string;
   department: string;
+  approver_id?: string;
 }
 
 export interface LeaveBalance {
@@ -28,6 +29,7 @@ export interface LeaveRequest {
   requested_on: string;
   approved_by?: string;
   comments?: string;
+  approver_id?: string;
 }
 
 // Obtener el perfil del usuario actual
@@ -90,6 +92,38 @@ export const getUserLeaveRequests = async (): Promise<LeaveRequest[]> => {
   return (data || []) as LeaveRequest[];
 };
 
+// Obtener todas las solicitudes de permiso del equipo (para el calendario compartido)
+export const getAllTeamRequests = async (): Promise<any[]> => {
+  const { data, error } = await supabase
+    .from('leave_requests')
+    .select(`
+      *,
+      profiles:user_id (name, department)
+    `)
+    .order('start_date', { ascending: true });
+    
+  if (error) {
+    console.error('Error al obtener solicitudes del equipo:', error);
+    return [];
+  }
+  
+  // Formatear los datos para que sean más fáciles de usar
+  return (data || []).map(item => ({
+    id: item.id,
+    user_id: item.user_id,
+    username: item.profiles?.name || 'Usuario desconocido',
+    department: item.profiles?.department || null,
+    type: item.type,
+    start_date: item.start_date,
+    end_date: item.end_date,
+    days: item.days,
+    status: item.status,
+    requested_on: item.requested_on,
+    approved_by: item.approved_by,
+    comments: item.comments
+  }));
+};
+
 // Obtener una solicitud de permiso específica
 export const getLeaveRequestById = async (id: string): Promise<LeaveRequest | null> => {
   const { data, error } = await supabase
@@ -112,12 +146,20 @@ export const createLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'use
   
   if (!user) return null;
   
+  // Obtener el ID del aprobador asignado al usuario
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('approver_id')
+    .eq('id', user.id)
+    .single();
+  
   const { data, error } = await supabase
     .from('leave_requests')
     .insert([{
       user_id: user.id,
       ...request,
       status: 'pending',
+      approver_id: profile?.approver_id || null
     }])
     .select()
     .single();
@@ -130,14 +172,61 @@ export const createLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'use
   return data as LeaveRequest;
 };
 
+// Obtener solicitudes pendientes para un aprobador
+export const getPendingRequestsForApprover = async (): Promise<any[]> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return [];
+  
+  const { data, error } = await supabase
+    .from('leave_requests')
+    .select(`
+      *,
+      profiles:user_id (name, email, department)
+    `)
+    .eq('approver_id', user.id)
+    .eq('status', 'pending')
+    .order('requested_on', { ascending: false });
+    
+  if (error) {
+    console.error('Error al obtener solicitudes pendientes:', error);
+    return [];
+  }
+  
+  return (data || []).map(item => ({
+    id: item.id,
+    user_id: item.user_id,
+    userName: item.profiles?.name || 'Usuario desconocido',
+    userEmail: item.profiles?.email || '',
+    department: item.profiles?.department || '',
+    type: item.type,
+    start_date: item.start_date,
+    end_date: item.end_date,
+    days: item.days,
+    status: item.status,
+    requested_on: item.requested_on,
+    comments: item.comments
+  }));
+};
+
 // Actualizar el estado de una solicitud
 export const updateLeaveRequestStatus = async (id: string, status: 'approved' | 'rejected', comments?: string): Promise<LeaveRequest | null> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return null;
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name')
+    .eq('id', user.id)
+    .single();
+  
   const { data, error } = await supabase
     .from('leave_requests')
     .update({ 
       status,
       comments,
-      approved_by: 'Supervisor' // En un sistema real, esto sería el nombre del aprobador
+      approved_by: profile?.name || 'Supervisor' // En un sistema real, esto sería el nombre del aprobador
     })
     .eq('id', id)
     .select()

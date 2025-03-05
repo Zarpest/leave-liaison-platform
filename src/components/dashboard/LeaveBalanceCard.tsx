@@ -12,6 +12,7 @@ interface LeaveBalanceCardProps {
   used: number;
   description?: string;
   className?: string;
+  approver?: string;
 }
 
 const LeaveBalanceCard = ({
@@ -20,6 +21,7 @@ const LeaveBalanceCard = ({
   used,
   description,
   className,
+  approver,
 }: LeaveBalanceCardProps) => {
   const remaining = total - used;
   const percentUsed = Math.round((used / total) * 100);
@@ -46,6 +48,11 @@ const LeaveBalanceCard = ({
             </div>
             {description && (
               <p className="text-sm text-muted-foreground">{description}</p>
+            )}
+            {approver && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Aprobador asignado: <span className="font-medium">{approver}</span>
+              </p>
             )}
           </div>
         </CardContent>
