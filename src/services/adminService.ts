@@ -8,6 +8,7 @@ export interface User {
   department?: string;
   leave_balance?: LeaveBalance;
   approver?: string;
+  approver_id?: string;
 }
 
 export interface LeaveBalance {
@@ -66,6 +67,7 @@ export const getAllUsers = async (): Promise<User[]> => {
     email: profile.email,
     department: profile.department,
     leave_balance: balanceMap[profile.id],
+    approver_id: profile.approver_id,
     approver: profile.approver_id
   }));
   

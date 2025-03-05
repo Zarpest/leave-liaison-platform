@@ -120,7 +120,8 @@ export const getAllTeamRequests = async (): Promise<any[]> => {
     status: item.status,
     requested_on: item.requested_on,
     approved_by: item.approved_by,
-    comments: item.comments
+    comments: item.comments,
+    approver_id: item.approver_id
   }));
 };
 
@@ -205,7 +206,8 @@ export const getPendingRequestsForApprover = async (): Promise<any[]> => {
     days: item.days,
     status: item.status,
     requested_on: item.requested_on,
-    comments: item.comments
+    comments: item.comments,
+    approver_id: item.approver_id
   }));
 };
 

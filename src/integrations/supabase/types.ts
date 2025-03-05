@@ -47,6 +47,7 @@ export type Database = {
       leave_requests: {
         Row: {
           approved_by: string | null
+          approver_id: string | null
           comments: string | null
           days: number
           end_date: string
@@ -59,6 +60,7 @@ export type Database = {
         }
         Insert: {
           approved_by?: string | null
+          approver_id?: string | null
           comments?: string | null
           days: number
           end_date: string
@@ -71,6 +73,7 @@ export type Database = {
         }
         Update: {
           approved_by?: string | null
+          approver_id?: string | null
           comments?: string | null
           days?: number
           end_date?: string
@@ -93,6 +96,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approver_id: string | null
           created_at: string
           department: string | null
           email: string
@@ -100,6 +104,7 @@ export type Database = {
           name: string
         }
         Insert: {
+          approver_id?: string | null
           created_at?: string
           department?: string | null
           email: string
@@ -107,6 +112,7 @@ export type Database = {
           name: string
         }
         Update: {
+          approver_id?: string | null
           created_at?: string
           department?: string | null
           email?: string
