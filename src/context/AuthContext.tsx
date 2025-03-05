@@ -10,6 +10,7 @@ interface User {
   email: string;
   name?: string;
   department?: string;
+  role?: string; // Added role field to user state
 }
 
 interface AuthContextType {
@@ -44,7 +45,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               id: userProfile.id,
               email: userProfile.email,
               name: userProfile.name,
-              department: userProfile.department
+              department: userProfile.department,
+              role: userProfile.role // Added role to user state
             });
             setIsAuthenticated(true);
           }
@@ -69,7 +71,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               id: userProfile.id,
               email: userProfile.email,
               name: userProfile.name,
-              department: userProfile.department
+              department: userProfile.department,
+              role: userProfile.role // Added role to user state
             });
             setIsAuthenticated(true);
           }

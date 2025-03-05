@@ -9,7 +9,7 @@ export interface User {
   leave_balance?: LeaveBalance;
   approver?: string;
   approver_id?: string;
-  role?: string; // New field for user role
+  role?: string; // Now properly typed field for user role
 }
 
 export interface LeaveBalance {
