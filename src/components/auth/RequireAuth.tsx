@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
@@ -8,8 +8,17 @@ interface RequireAuthProps {
 }
 
 const RequireAuth: React.FC<RequireAuthProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+
+  // Si está cargando, mostrar un indicador de carga
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     // Redireccionar al login si no está autenticado

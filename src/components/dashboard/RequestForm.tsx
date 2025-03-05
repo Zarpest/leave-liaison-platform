@@ -29,13 +29,14 @@ import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { SlideIn } from "@/components/animations/Transitions";
+import { createLeaveRequest } from "@/services/supabaseService";
 
 const leaveTypes = [
-  { value: "vacation", label: "Vacaciones" },
-  { value: "sick", label: "Permiso por Enfermedad" },
-  { value: "personal", label: "Permiso Personal" },
-  { value: "bereavement", label: "Permiso por Duelo" },
-  { value: "parental", label: "Permiso Parental" },
+  { value: "Vacaciones", label: "Vacaciones" },
+  { value: "Permiso por Enfermedad", label: "Permiso por Enfermedad" },
+  { value: "Permiso Personal", label: "Permiso Personal" },
+  { value: "Permiso por Duelo", label: "Permiso por Duelo" },
+  { value: "Permiso Parental", label: "Permiso Parental" },
 ];
 
 const RequestForm = () => {
@@ -59,7 +60,7 @@ const RequestForm = () => {
     return 0;
   }, [date.from, date.to]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!date.from || !date.to || !leaveType) {
@@ -73,19 +74,42 @@ const RequestForm = () => {
     
     setIsSubmitting(true);
     
-    // Simular llamada a API
-    setTimeout(() => {
-      toast({
-        title: "Éxito",
-        description: "Solicitud de permiso enviada correctamente"
-      });
-      setIsSubmitting(false);
+    try {
+      // Convertir fechas a formato ISO string para Supabase
+      const startDate = date.from.toISOString().split('T')[0];
+      const endDate = date.to.toISOString().split('T')[0];
       
-      // Resetear formulario
-      setDate({ from: undefined, to: undefined });
-      setLeaveType("");
-      setReason("");
-    }, 1500);
+      const result = await createLeaveRequest({
+        type: leaveType,
+        start_date: startDate,
+        end_date: endDate,
+        days: businessDays,
+        comments: reason || undefined
+      });
+      
+      if (result) {
+        toast({
+          title: "Éxito",
+          description: "Solicitud de permiso enviada correctamente"
+        });
+        
+        // Resetear formulario
+        setDate({ from: undefined, to: undefined });
+        setLeaveType("");
+        setReason("");
+      } else {
+        throw new Error("No se pudo crear la solicitud");
+      }
+    } catch (error) {
+      console.error("Error al enviar solicitud:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo enviar la solicitud. Inténtalo de nuevo."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Función para formatear fechas en español

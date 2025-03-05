@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { FadeIn } from "@/components/animations/Transitions";
 import { UserIcon, KeyIcon, UserPlusIcon, BuildingIcon, MailIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -15,9 +16,16 @@ const Register = () => {
   const [department, setDepartment] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { register, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Redireccionar si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,36 +40,22 @@ const Register = () => {
       return;
     }
 
-    setIsLoading(true);
-
     try {
-      // En una implementación real, enviaríamos datos a un servicio de backend
-      // En este ejemplo, simulamos el registro con un retraso
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Almacenamos datos de usuario en localStorage (solo para demostración)
-      // En producción, esto se manejaría con un backend adecuado
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userName", name);
-      localStorage.setItem("userDepartment", department);
-      
-      toast({
-        title: "Registro exitoso",
-        description: "Tu cuenta ha sido creada correctamente",
-      });
-      
-      navigate("/");
+      await register(name, email, department, password);
+      // La redirección se maneja en el efecto useEffect
     } catch (error) {
-      toast({
-        title: "Error en el registro",
-        description: "Ocurrió un problema al crear tu cuenta. Inténtalo de nuevo.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      // El manejo de errores ya se realiza en el contexto de autenticación
+      console.error("Error en el formulario de registro:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 py-8">
@@ -158,8 +152,8 @@ const Register = () => {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
                   <>Creando cuenta...</>
                 ) : (
                   <>

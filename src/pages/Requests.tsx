@@ -27,9 +27,9 @@ import {
   FileTextIcon
 } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { getLeaveRequests, LeaveRequest } from "@/services/googleSheetsService";
+import { getUserLeaveRequests, LeaveRequest } from "@/services/supabaseService";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,7 +43,7 @@ const Requests = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const requests = await getLeaveRequests();
+        const requests = await getUserLeaveRequests();
         setLeaveRequests(requests);
       } catch (error) {
         console.error("Error al cargar solicitudes:", error);
@@ -67,8 +67,17 @@ const Requests = () => {
       request.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Función para formatear fechas desde strings ISO
+  const formatDate = (dateString: string) => {
+    return format(parseISO(dateString), "d MMM yyyy", { locale: es });
+  };
+
   const handleViewDetails = (id: string) => {
     navigate(`/requests/${id}`);
+  };
+
+  const handleNewRequest = () => {
+    navigate("/");
   };
 
   return (
@@ -98,7 +107,7 @@ const Requests = () => {
                     className="pl-9 h-10 w-full sm:w-auto min-w-[200px]"
                   />
                 </div>
-                <Button>
+                <Button onClick={handleNewRequest}>
                   <PlusIcon className="h-4 w-4 mr-2" />
                   Nueva Solicitud
                 </Button>
@@ -135,20 +144,20 @@ const Requests = () => {
                       ) : (
                         filteredRequests.map((request) => (
                           <TableRow key={request.id} className="hover:bg-muted/40">
-                            <TableCell className="font-medium">{request.id}</TableCell>
+                            <TableCell className="font-medium">{request.id.slice(0, 8)}...</TableCell>
                             <TableCell>{request.type}</TableCell>
                             <TableCell>
-                              {format(request.startDate, "d MMM yyyy", { locale: es })}
-                              {!request.startDate.toDateString().includes(request.endDate.toDateString()) && (
-                                <span> - {format(request.endDate, "d MMM yyyy", { locale: es })}</span>
+                              {formatDate(request.start_date)}
+                              {request.start_date !== request.end_date && (
+                                <span> - {formatDate(request.end_date)}</span>
                               )}
                             </TableCell>
                             <TableCell className="text-center">{request.days}</TableCell>
                             <TableCell className="text-center">
-                              <StatusBadge status={request.status as any} />
+                              <StatusBadge status={request.status} />
                             </TableCell>
                             <TableCell>
-                              {format(request.requestedOn, "d MMM yyyy", { locale: es })}
+                              {formatDate(request.requested_on)}
                             </TableCell>
                             <TableCell className="text-right">
                               <Button

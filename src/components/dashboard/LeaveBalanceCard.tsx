@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Progress } from "@/components/ui/progress";
 import { CalendarIcon, ArrowRightIcon } from "lucide-react";
 import { FadeIn } from "@/components/animations/Transitions";
+import { Link } from "react-router-dom";
 
 interface LeaveBalanceCardProps {
   title: string;
@@ -49,13 +50,13 @@ const LeaveBalanceCard = ({
           </div>
         </CardContent>
         <CardFooter className="pt-0">
-          <a 
-            href="#" 
+          <Link 
+            to="/requests" 
             className="text-xs text-primary flex items-center group"
           >
             Ver Historial
             <ArrowRightIcon className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
-          </a>
+          </Link>
         </CardFooter>
       </Card>
     </FadeIn>

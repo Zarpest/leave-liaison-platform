@@ -13,28 +13,28 @@ import {
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { ArrowLeftIcon, PrinterIcon, FilePenIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-import { LeaveRequest, getLeaveRequests } from "@/services/googleSheetsService";
+import { LeaveRequest, getLeaveRequestById, updateLeaveRequestStatus } from "@/services/supabaseService";
 import { useToast } from "@/hooks/use-toast";
 
 const DetailedHistory = () => {
   const { id } = useParams<{ id: string }>();
   const [request, setRequest] = useState<LeaveRequest | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
+      if (!id) return;
+
       try {
-        // En una implementación real, haríamos una llamada específica
-        // para obtener los detalles de una solicitud por ID
-        const allRequests = await getLeaveRequests();
-        const foundRequest = allRequests.find(req => req.id === id);
+        const requestData = await getLeaveRequestById(id);
         
-        if (foundRequest) {
-          setRequest(foundRequest);
+        if (requestData) {
+          setRequest(requestData);
         } else {
           toast({
             title: "Error",
@@ -58,8 +58,40 @@ const DetailedHistory = () => {
     fetchRequestDetails();
   }, [id, navigate, toast]);
 
+  const handleCancelRequest = async () => {
+    if (!id) return;
+    
+    setCancelling(true);
+    try {
+      await updateLeaveRequestStatus(id, 'rejected', 'Cancelado por el usuario');
+      
+      toast({
+        title: "Éxito",
+        description: "Solicitud cancelada correctamente"
+      });
+      
+      // Actualizar la solicitud en la vista
+      setRequest(prev => prev ? { ...prev, status: 'rejected', comments: 'Cancelado por el usuario' } : null);
+      
+    } catch (error) {
+      console.error("Error al cancelar solicitud:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo cancelar la solicitud",
+        variant: "destructive",
+      });
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   const handlePrint = () => {
     window.print();
+  };
+
+  // Función para formatear fechas desde strings ISO
+  const formatDate = (dateString: string, formatStr: string = "d MMM yyyy") => {
+    return format(parseISO(dateString), formatStr, { locale: es });
   };
 
   if (loading) {
@@ -121,7 +153,7 @@ const DetailedHistory = () => {
                 <div>
                   <CardTitle className="text-2xl">{request.type}</CardTitle>
                   <CardDescription>
-                    Solicitud #{request.id} - Creada el {format(request.requestedOn, "d 'de' MMMM 'de' yyyy", { locale: es })}
+                    Solicitud #{request.id} - Creada el {formatDate(request.requested_on, "d 'de' MMMM 'de' yyyy")}
                   </CardDescription>
                 </div>
                 <StatusBadge status={request.status} className="mt-2 sm:mt-0" />
@@ -133,13 +165,13 @@ const DetailedHistory = () => {
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Fecha de Inicio</h3>
                     <p className="text-base mt-1">
-                      {format(request.startDate, "EEEE d 'de' MMMM 'de' yyyy", { locale: es })}
+                      {formatDate(request.start_date, "EEEE d 'de' MMMM 'de' yyyy")}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Fecha de Fin</h3>
                     <p className="text-base mt-1">
-                      {format(request.endDate, "EEEE d 'de' MMMM 'de' yyyy", { locale: es })}
+                      {formatDate(request.end_date, "EEEE d 'de' MMMM 'de' yyyy")}
                     </p>
                   </div>
                   <div>
@@ -160,10 +192,10 @@ const DetailedHistory = () => {
                       </span>
                     </div>
                   </div>
-                  {request.approvedBy && (
+                  {request.approved_by && (
                     <div>
                       <h3 className="text-sm font-medium text-muted-foreground">Aprobado por</h3>
-                      <p className="text-base mt-1">{request.approvedBy}</p>
+                      <p className="text-base mt-1">{request.approved_by}</p>
                     </div>
                   )}
                   {request.comments && (
@@ -184,8 +216,12 @@ const DetailedHistory = () => {
                       Editar Solicitud
                     </Button>
                   )}
-                  <Button variant="destructive" disabled={request.status !== 'pending'}>
-                    Cancelar Solicitud
+                  <Button 
+                    variant="destructive" 
+                    disabled={request.status !== 'pending' || cancelling}
+                    onClick={handleCancelRequest}
+                  >
+                    {cancelling ? 'Cancelando...' : 'Cancelar Solicitud'}
                   </Button>
                 </div>
               </div>

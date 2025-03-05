@@ -1,8 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { loginWithEmail, registerWithEmail, logout, getCurrentUserProfile } from "@/services/supabaseService";
+import { useToast } from "@/hooks/use-toast";
 
 interface User {
+  id: string;
   email: string;
   name?: string;
   department?: string;
@@ -14,6 +18,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, department: string, password: string) => Promise<void>;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,74 +26,145 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
+  // Verificar sesión existente al cargar la aplicación
   useEffect(() => {
-    // Verificar si hay una sesión existente al cargar la aplicación
-    const checkAuth = () => {
-      const authStatus = localStorage.getItem("isAuthenticated");
-      if (authStatus === "true") {
-        const email = localStorage.getItem("userEmail") || "";
-        const name = localStorage.getItem("userName") || undefined;
-        const department = localStorage.getItem("userDepartment") || undefined;
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         
-        setUser({ email, name, department });
-        setIsAuthenticated(true);
+        if (session) {
+          const userProfile = await getCurrentUserProfile();
+          
+          if (userProfile) {
+            setUser({
+              id: userProfile.id,
+              email: userProfile.email,
+              name: userProfile.name,
+              department: userProfile.department
+            });
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error al verificar sesión:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    checkAuth();
+    checkSession();
+    
+    // Suscribirse a cambios en la autenticación
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          const userProfile = await getCurrentUserProfile();
+          
+          if (userProfile) {
+            setUser({
+              id: userProfile.id,
+              email: userProfile.email,
+              name: userProfile.name,
+              department: userProfile.department
+            });
+            setIsAuthenticated(true);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
-    // En una implementación real, esto verificaría credenciales con un backend
-    // Para este ejemplo, solo simulamos el proceso
-    
-    // Simular un retraso de red
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // En producción, verificaríamos las credenciales con un servidor
-    if (email && password) {
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userEmail", email);
+    try {
+      setLoading(true);
+      await loginWithEmail(email, password);
       
-      setUser({ email });
-      setIsAuthenticated(true);
-    } else {
-      throw new Error("Credenciales inválidas");
+      // La sesión se actualizará automáticamente a través del evento de cambio de estado
+      toast({
+        title: "Inicio de sesión exitoso",
+        description: "Bienvenido a la plataforma de permisos",
+      });
+    } catch (error: any) {
+      console.error("Error al iniciar sesión:", error);
+      toast({
+        title: "Error de inicio de sesión",
+        description: error.message || "Credenciales inválidas",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (name: string, email: string, department: string, password: string) => {
-    // En una implementación real, esto registraría al usuario en un backend
-    // Para este ejemplo, solo simulamos el proceso
-    
-    // Simular un retraso de red
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // En producción, registraríamos al usuario en un servidor
-    localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userDepartment", department);
-    
-    setUser({ email, name, department });
-    setIsAuthenticated(true);
+    try {
+      setLoading(true);
+      await registerWithEmail(email, password, { name, department });
+      
+      toast({
+        title: "Registro exitoso",
+        description: "Tu cuenta ha sido creada correctamente",
+      });
+      
+      // El perfil se creará automáticamente a través del trigger en Supabase
+    } catch (error: any) {
+      console.error("Error al registrarse:", error);
+      toast({
+        title: "Error en el registro",
+        description: error.message || "No se pudo crear la cuenta",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userDepartment");
-    
-    setUser(null);
-    setIsAuthenticated(false);
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      await logout();
+      
+      // La sesión se actualizará automáticamente a través del evento de cambio de estado
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente",
+      });
+      
+      navigate("/login");
+    } catch (error: any) {
+      console.error("Error al cerrar sesión:", error);
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo cerrar sesión",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated, 
+      login, 
+      register, 
+      logout: handleLogout,
+      loading
+    }}>
       {children}
     </AuthContext.Provider>
   );

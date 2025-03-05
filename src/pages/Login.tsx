@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,47 +8,41 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { FadeIn } from "@/components/animations/Transitions";
 import { UserIcon, KeyIcon, LogInIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Redireccionar si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    // Simulación de inicio de sesión
     try {
-      // En una implementación real, esta sería una llamada a una API o servicio de autenticación
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // En un entorno de producción, confirmaríamos credenciales con el backend
-      if (email && password) {
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("userEmail", email);
-        
-        toast({
-          title: "Inicio de sesión exitoso",
-          description: "Bienvenido a la plataforma de permisos",
-        });
-        
-        navigate("/");
-      } else {
-        throw new Error("Credenciales inválidas");
-      }
+      await login(email, password);
+      // La redirección se maneja en el efecto useEffect
     } catch (error) {
-      toast({
-        title: "Error de inicio de sesión",
-        description: "Correo electrónico o contraseña incorrectos",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      // El manejo de errores ya se realiza en el contexto de autenticación
+      console.error("Error en el formulario de login:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -100,8 +94,8 @@ const Login = () => {
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
                   <>Iniciando sesión...</>
                 ) : (
                   <>

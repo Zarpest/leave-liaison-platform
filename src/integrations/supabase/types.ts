@@ -9,7 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      leave_balances: {
+        Row: {
+          id: string
+          personal_days: number
+          sick_days: number
+          updated_at: string
+          user_id: string
+          vacation_days: number
+        }
+        Insert: {
+          id?: string
+          personal_days?: number
+          sick_days?: number
+          updated_at?: string
+          user_id: string
+          vacation_days?: number
+        }
+        Update: {
+          id?: string
+          personal_days?: number
+          sick_days?: number
+          updated_at?: string
+          user_id?: string
+          vacation_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_balances_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_requests: {
+        Row: {
+          approved_by: string | null
+          comments: string | null
+          days: number
+          end_date: string
+          id: string
+          requested_on: string
+          start_date: string
+          status: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          comments?: string | null
+          days: number
+          end_date: string
+          id?: string
+          requested_on?: string
+          start_date: string
+          status?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          comments?: string | null
+          days?: number
+          end_date?: string
+          id?: string
+          requested_on?: string
+          start_date?: string
+          status?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          department: string | null
+          email: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          email: string
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          email?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
