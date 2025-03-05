@@ -9,6 +9,7 @@ export interface User {
   leave_balance?: LeaveBalance;
   approver?: string;
   approver_id?: string;
+  role?: string; // New field for user role
 }
 
 export interface LeaveBalance {
@@ -32,6 +33,39 @@ export interface LeaveRequest {
   comments?: string;
   approver_id?: string;
 }
+
+// Check if user is super admin
+export const isSuperAdmin = async (): Promise<boolean> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return false;
+  
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+    
+  if (error || !data) {
+    console.error('Error al verificar rol:', error);
+    return false;
+  }
+  
+  return data.role === 'super_admin';
+};
+
+// Set user role
+export const setUserRole = async (userId: string, role: string): Promise<void> => {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ role })
+    .eq('id', userId);
+    
+  if (error) {
+    console.error('Error al actualizar rol:', error);
+    throw error;
+  }
+};
 
 // Obtener todos los usuarios con sus balances
 export const getAllUsers = async (): Promise<User[]> => {
@@ -68,7 +102,8 @@ export const getAllUsers = async (): Promise<User[]> => {
     department: profile.department,
     leave_balance: balanceMap[profile.id],
     approver_id: profile.approver_id,
-    approver: profile.approver_id
+    approver: profile.approver_id,
+    role: profile.role
   }));
   
   return users;

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { SlideIn } from "@/components/animations/Transitions";
 import { createLeaveRequest } from "@/services/supabaseService";
+import { getAllUsers, User } from "@/services/adminService";
 
 const leaveTypes = [
   { value: "Vacaciones", label: "Vacaciones" },
@@ -51,7 +52,24 @@ const RequestForm = () => {
   const [leaveType, setLeaveType] = useState<string>("");
   const [reason, setReason] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [approvers, setApprovers] = useState<User[]>([]);
+  const [selectedApproverId, setSelectedApproverId] = useState<string>("");
   const { toast } = useToast();
+
+  // Fetch potential approvers
+  useEffect(() => {
+    const fetchApprovers = async () => {
+      try {
+        const users = await getAllUsers();
+        // Filter only users that could be approvers (you might want to refine this logic)
+        setApprovers(users);
+      } catch (error) {
+        console.error("Error fetching approvers:", error);
+      }
+    };
+    
+    fetchApprovers();
+  }, []);
 
   const businessDays = React.useMemo(() => {
     if (date.from && date.to) {
@@ -84,7 +102,8 @@ const RequestForm = () => {
         start_date: startDate,
         end_date: endDate,
         days: businessDays,
-        comments: reason || undefined
+        comments: reason || undefined,
+        approver_id: selectedApproverId || undefined
       });
       
       if (result) {
@@ -97,6 +116,7 @@ const RequestForm = () => {
         setDate({ from: undefined, to: undefined });
         setLeaveType("");
         setReason("");
+        setSelectedApproverId("");
       } else {
         throw new Error("No se pudo crear la solicitud");
       }
@@ -138,6 +158,25 @@ const RequestForm = () => {
                   {leaveTypes.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="approver">Enviar solicitud a</Label>
+              <Select
+                value={selectedApproverId}
+                onValueChange={setSelectedApproverId}
+              >
+                <SelectTrigger id="approver" className="w-full">
+                  <SelectValue placeholder="Selecciona un aprobador" />
+                </SelectTrigger>
+                <SelectContent>
+                  {approvers.map((approver) => (
+                    <SelectItem key={approver.id} value={approver.id}>
+                      {approver.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -191,7 +230,6 @@ const RequestForm = () => {
                       selected={date.to}
                       onSelect={(day) => setDate({ ...date, to: day })}
                       disabled={(currentDate) => {
-                        // Corrigiendo: usando la referencia correcta al estado 'date.from'
                         const minDate = date.from ? addDays(date.from, 0) : new Date();
                         return currentDate < minDate;
                       }}

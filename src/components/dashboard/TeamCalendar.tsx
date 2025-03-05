@@ -15,6 +15,9 @@ import { format, isSameDay, isSameMonth } from "date-fns";
 import { SlideIn } from "@/components/animations/Transitions";
 import { getUserLeaveRequests, getAllTeamRequests } from "@/services/supabaseService";
 
+// Custom CSS to ensure calendar day numbers don't overflow
+import "./TeamCalendar.css";
+
 const TeamCalendar = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [view, setView] = useState<"calendar" | "list">("calendar");
@@ -80,7 +83,7 @@ const TeamCalendar = () => {
                   mode="single"
                   selected={date}
                   onSelect={(newDate) => newDate && setDate(newDate)}
-                  className="rounded-md border max-w-full"
+                  className="rounded-md border max-w-full calendar-fixed"
                   modifiers={{
                     highlight: (date) => hasEventOnDate(date)
                   }}

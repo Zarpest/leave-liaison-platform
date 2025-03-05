@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Tipos de datos
@@ -142,17 +141,24 @@ export const getLeaveRequestById = async (id: string): Promise<LeaveRequest | nu
 };
 
 // Crear una nueva solicitud de permiso
-export const createLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'user_id' | 'requested_on' | 'status'>): Promise<LeaveRequest | null> => {
+export const createLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'user_id' | 'requested_on' | 'status'> & { approver_id?: string }): Promise<LeaveRequest | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) return null;
   
-  // Obtener el ID del aprobador asignado al usuario
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('approver_id')
-    .eq('id', user.id)
-    .single();
+  // Use the provided approver_id if available, otherwise get the default one from the profile
+  let approver_id = request.approver_id;
+  
+  if (!approver_id) {
+    // Obtener el ID del aprobador asignado al usuario
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('approver_id')
+      .eq('id', user.id)
+      .single();
+    
+    approver_id = profile?.approver_id || null;
+  }
   
   const { data, error } = await supabase
     .from('leave_requests')
@@ -160,7 +166,7 @@ export const createLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'use
       user_id: user.id,
       ...request,
       status: 'pending',
-      approver_id: profile?.approver_id || null
+      approver_id: approver_id
     }])
     .select()
     .single();

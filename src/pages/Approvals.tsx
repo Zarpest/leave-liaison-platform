@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { PageTransition } from "@/components/animations/Transitions";
 import {
@@ -22,72 +22,77 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { CheckIcon, FilterIcon, XIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
-
-// Datos de ejemplo de solicitudes pendientes
-const pendingRequests = [
-  {
-    id: "1",
-    employeeName: "Juan García",
-    employeeAvatar: "https://github.com/shadcn.png",
-    employeeInitials: "JG",
-    type: "Vacaciones",
-    startDate: new Date("2024-06-10"),
-    endDate: new Date("2024-06-15"),
-    days: 5,
-    requestedOn: new Date("2024-05-20"),
-    reason: "Vacaciones familiares",
-  },
-  {
-    id: "2",
-    employeeName: "María Rodríguez",
-    employeeAvatar: "",
-    employeeInitials: "MR",
-    type: "Permiso por Enfermedad",
-    startDate: new Date("2024-05-25"),
-    endDate: new Date("2024-05-26"),
-    days: 2,
-    requestedOn: new Date("2024-05-24"),
-    reason: "No me encuentro bien",
-  },
-  {
-    id: "3",
-    employeeName: "David Sánchez",
-    employeeAvatar: "",
-    employeeInitials: "DS",
-    type: "Permiso Personal",
-    startDate: new Date("2024-06-01"),
-    endDate: new Date("2024-06-01"),
-    days: 1,
-    requestedOn: new Date("2024-05-22"),
-    reason: "Cita médica",
-  },
-];
+import { getPendingRequestsForApprover, updateLeaveRequestStatus } from "@/services/supabaseService";
+import { useAuth } from "@/context/AuthContext";
 
 const Approvals = () => {
-  const [requests, setRequests] = React.useState(pendingRequests);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  const handleApprove = (id: string) => {
-    setRequests(requests.filter((request) => request.id !== id));
-    toast({
-      title: "Éxito",
-      description: "Solicitud aprobada correctamente"
-    });
+  useEffect(() => {
+    const fetchPendingRequests = async () => {
+      try {
+        setLoading(true);
+        const pendingRequests = await getPendingRequestsForApprover();
+        setRequests(pendingRequests);
+      } catch (error) {
+        console.error("Error fetching pending requests:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se pudieron cargar las solicitudes pendientes"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPendingRequests();
+  }, [toast]);
+
+  const handleApprove = async (id: string) => {
+    try {
+      await updateLeaveRequestStatus(id, 'approved', "Solicitud aprobada");
+      setRequests(requests.filter((request) => request.id !== id));
+      toast({
+        title: "Éxito",
+        description: "Solicitud aprobada correctamente"
+      });
+    } catch (error) {
+      console.error("Error approving request:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo aprobar la solicitud"
+      });
+    }
   };
 
-  const handleReject = (id: string) => {
-    setRequests(requests.filter((request) => request.id !== id));
-    toast({
-      title: "Éxito",
-      description: "Solicitud rechazada correctamente"
-    });
+  const handleReject = async (id: string) => {
+    try {
+      await updateLeaveRequestStatus(id, 'rejected', "Solicitud rechazada");
+      setRequests(requests.filter((request) => request.id !== id));
+      toast({
+        title: "Éxito",
+        description: "Solicitud rechazada correctamente"
+      });
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo rechazar la solicitud"
+      });
+    }
   };
 
   // Función para formatear fechas en español
-  const formatDate = (date: Date) => {
-    return format(date, "d MMM yyyy", { locale: es });
+  const formatDate = (dateString: string) => {
+    return format(parseISO(dateString), "d MMM yyyy", { locale: es });
   };
 
   return (
@@ -115,7 +120,11 @@ const Approvals = () => {
               </Button>
             </CardHeader>
             <CardContent>
-              {requests.length > 0 ? (
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <p>Cargando solicitudes...</p>
+                </div>
+              ) : requests.length > 0 ? (
                 <div className="rounded-md border overflow-hidden">
                   <Table>
                     <TableHeader>
@@ -135,28 +144,28 @@ const Approvals = () => {
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
                                 <AvatarImage
-                                  src={request.employeeAvatar}
-                                  alt={request.employeeName}
+                                  src=""
+                                  alt={request.userName}
                                 />
                                 <AvatarFallback>
-                                  {request.employeeInitials}
+                                  {request.userName.split(' ').map((n: string) => n[0]).join('')}
                                 </AvatarFallback>
                               </Avatar>
                               <span className="font-medium">
-                                {request.employeeName}
+                                {request.userName}
                               </span>
                             </div>
                           </TableCell>
                           <TableCell>{request.type}</TableCell>
                           <TableCell>
-                            {formatDate(request.startDate)}
-                            {!request.startDate.toDateString().includes(request.endDate.toDateString()) && (
-                              <span> - {formatDate(request.endDate)}</span>
+                            {formatDate(request.start_date)}
+                            {request.start_date !== request.end_date && (
+                              <span> - {formatDate(request.end_date)}</span>
                             )}
                           </TableCell>
                           <TableCell className="text-center">{request.days}</TableCell>
                           <TableCell>
-                            {formatDate(request.requestedOn)}
+                            {formatDate(request.requested_on)}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
