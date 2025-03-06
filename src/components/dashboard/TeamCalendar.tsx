@@ -11,9 +11,9 @@ import { Calendar } from "@/components/ui/calendar";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format, isSameDay, isSameMonth } from "date-fns";
+import { format, isSameDay, isSameMonth, isWithinInterval, parseISO } from "date-fns";
 import { SlideIn } from "@/components/animations/Transitions";
-import { getUserLeaveRequests, getAllTeamRequests } from "@/services/supabaseService";
+import { getAllTeamRequests } from "@/services/supabaseService";
 
 // Custom CSS to ensure calendar day numbers don't overflow
 import "./TeamCalendar.css";
@@ -29,7 +29,15 @@ const TeamCalendar = () => {
       try {
         setLoading(true);
         const teamRequests = await getAllTeamRequests();
-        setTeamData(teamRequests);
+        
+        // Parse date strings to Date objects to make comparisons easier
+        const formattedRequests = teamRequests.map(request => ({
+          ...request,
+          startDate: parseISO(request.start_date),
+          endDate: parseISO(request.end_date)
+        }));
+        
+        setTeamData(formattedRequests);
       } catch (error) {
         console.error("Error fetching team data:", error);
       } finally {
@@ -40,20 +48,42 @@ const TeamCalendar = () => {
     fetchData();
   }, []);
 
+  // Helper function to check if a date falls within a range
+  const isDateInRange = (date: Date, startDate: Date, endDate: Date) => {
+    try {
+      return isWithinInterval(date, { start: startDate, end: endDate });
+    } catch (error) {
+      console.error("Invalid date range:", error);
+      return false;
+    }
+  };
+
   // Encuentra eventos para la fecha seleccionada
-  const eventsForSelectedDate = teamData.filter(event => 
-    isSameDay(new Date(event.start_date), date) || 
-    isSameDay(new Date(event.end_date), date) || 
-    (date >= new Date(event.start_date) && date <= new Date(event.end_date))
-  );
+  const eventsForSelectedDate = teamData.filter(event => {
+    // Only include approved events
+    if (event.status !== 'approved') return false;
+    
+    try {
+      return isDateInRange(date, event.startDate, event.endDate);
+    } catch (error) {
+      console.error("Error checking date range:", error, event);
+      return false;
+    }
+  });
 
   // Estilo dinámico para días con eventos
   const hasEventOnDate = (date: Date) => {
-    return teamData.some(event => 
-      isSameDay(new Date(event.start_date), date) || 
-      isSameDay(new Date(event.end_date), date) || 
-      (date >= new Date(event.start_date) && date <= new Date(event.end_date))
-    );
+    return teamData.some(event => {
+      // Only mark dates with approved events
+      if (event.status !== 'approved') return false;
+      
+      try {
+        return isDateInRange(date, event.startDate, event.endDate);
+      } catch (error) {
+        console.error("Error checking date range:", error, event);
+        return false;
+      }
+    });
   };
 
   return (
@@ -126,9 +156,9 @@ const TeamCalendar = () => {
                               <span className="text-xs text-muted-foreground">{event.type}</span>
                               <span className="text-xs text-muted-foreground">•</span>
                               <span className="text-xs text-muted-foreground">
-                                {format(new Date(event.start_date), "d MMM")} 
-                                {!isSameDay(new Date(event.start_date), new Date(event.end_date)) && 
-                                  ` - ${format(new Date(event.end_date), "d MMM")}`}
+                                {format(event.startDate, "d MMM")} 
+                                {!isSameDay(event.startDate, event.endDate) && 
+                                  ` - ${format(event.endDate, "d MMM")}`}
                               </span>
                             </div>
                           </div>
@@ -148,8 +178,9 @@ const TeamCalendar = () => {
                     {Array.from(new Set(teamData.map(event => event.username))).map(username => {
                       const userEvents = teamData.filter(event => 
                         event.username === username && 
-                        (isSameMonth(new Date(event.start_date), date) || 
-                         isSameMonth(new Date(event.end_date), date))
+                        event.status === 'approved' &&
+                        (isSameMonth(event.startDate, date) || 
+                         isSameMonth(event.endDate, date))
                       );
                       
                       return userEvents.length > 0 ? (
@@ -172,9 +203,9 @@ const TeamCalendar = () => {
                                 <div>
                                   <p className="text-sm">{event.type}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {format(new Date(event.start_date), "d MMM")} 
-                                    {!isSameDay(new Date(event.start_date), new Date(event.end_date)) && 
-                                      ` - ${format(new Date(event.end_date), "d MMM")}`}
+                                    {format(event.startDate, "d MMM")} 
+                                    {!isSameDay(event.startDate, event.endDate) && 
+                                      ` - ${format(event.endDate, "d MMM")}`}
                                   </p>
                                 </div>
                                 <StatusBadge status={event.status as any} />
