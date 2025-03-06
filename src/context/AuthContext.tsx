@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,7 +45,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role // Now this will work with the updated interface
+              role: userProfile.role
             });
             setIsAuthenticated(true);
           }
@@ -69,7 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role // Now this will work with the updated interface
+              role: userProfile.role
             });
             setIsAuthenticated(true);
           }
