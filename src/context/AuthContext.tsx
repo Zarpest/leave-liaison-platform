@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,7 +30,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Verificar sesión existente al cargar la aplicación
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -46,7 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role // Added role to user state
+              role: userProfile.role // Now this will work with the updated interface
             });
             setIsAuthenticated(true);
           }
@@ -60,7 +58,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     checkSession();
     
-    // Suscribirse a cambios en la autenticación
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
@@ -72,7 +69,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role // Added role to user state
+              role: userProfile.role // Now this will work with the updated interface
             });
             setIsAuthenticated(true);
           }
@@ -93,7 +90,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       await loginWithEmail(email, password);
       
-      // La sesión se actualizará automáticamente a través del evento de cambio de estado
       toast({
         title: "Inicio de sesión exitoso",
         description: "Bienvenido a la plataforma de permisos",
@@ -121,7 +117,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         description: "Tu cuenta ha sido creada correctamente",
       });
       
-      // El perfil se creará automáticamente a través del trigger en Supabase
     } catch (error: any) {
       console.error("Error al registrarse:", error);
       toast({
@@ -140,7 +135,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       await logout();
       
-      // La sesión se actualizará automáticamente a través del evento de cambio de estado
       toast({
         title: "Sesión cerrada",
         description: "Has cerrado sesión correctamente",
