@@ -9,7 +9,7 @@ interface User {
   email: string;
   name?: string;
   department?: string;
-  role?: string; // Added role field to user state
+  role?: string; // Adding the role property to the User interface
 }
 
 interface AuthContextType {
