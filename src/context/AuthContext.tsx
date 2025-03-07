@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role || undefined
+              role: userProfile.role
             });
             setIsAuthenticated(true);
           }
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role || undefined
+              role: userProfile.role
             });
             setIsAuthenticated(true);
           }
