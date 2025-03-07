@@ -10,7 +10,7 @@ interface User {
   email: string;
   name?: string;
   department?: string;
-  role?: string;
+  role?: string;  // Added role to the interface
 }
 
 interface AuthContextType {
