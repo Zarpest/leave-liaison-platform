@@ -109,23 +109,25 @@ const TeamCalendar = () => {
           ) : (
             <div className="grid md:grid-cols-7 gap-6">
               <div className="md:col-span-3">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(newDate) => newDate && setDate(newDate)}
-                  className="rounded-md border max-w-full calendar-fixed"
-                  modifiers={{
-                    highlight: (date) => hasEventOnDate(date)
-                  }}
-                  modifiersStyles={{
-                    highlight: {
-                      backgroundColor: "hsl(var(--primary) / 0.15)",
-                      color: "hsl(var(--primary))",
-                      fontWeight: "500",
-                      borderRadius: "9999px"
-                    }
-                  }}
-                />
+                <div className="w-full">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(newDate) => newDate && setDate(newDate)}
+                    className="rounded-md border w-full calendar-fixed"
+                    modifiers={{
+                      highlight: (date) => hasEventOnDate(date)
+                    }}
+                    modifiersStyles={{
+                      highlight: {
+                        backgroundColor: "hsl(var(--primary) / 0.15)",
+                        color: "hsl(var(--primary))",
+                        fontWeight: "500",
+                        borderRadius: "9999px"
+                      }
+                    }}
+                  />
+                </div>
               </div>
               
               <div className="md:col-span-4">

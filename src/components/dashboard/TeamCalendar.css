@@ -16,10 +16,29 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0 auto;
+  padding: 0;
 }
 
 .calendar-fixed .rdp-day {
   margin: 0 auto;
+}
+
+.calendar-fixed .rdp-nav,
+.calendar-fixed .rdp-caption {
+  position: relative;
+}
+
+.calendar-fixed .rdp-head_cell {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0;
+  text-align: center;
+  width: 36px;
+}
+
+.calendar-fixed .rdp-row {
+  justify-content: space-around;
 }
 
 @media (max-width: 640px) {
@@ -27,5 +46,9 @@
     width: 32px;
     height: 32px;
     font-size: 0.75rem;
+  }
+  
+  .calendar-fixed .rdp-head_cell {
+    width: 32px;
   }
 }
