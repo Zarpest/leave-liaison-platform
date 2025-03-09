@@ -18,6 +18,13 @@
   align-items: center;
   margin: 0 auto;
   padding: 0;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.calendar-fixed .rdp-button:hover {
+  background-color: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
 }
 
 .calendar-fixed .rdp-day {
@@ -35,10 +42,32 @@
   padding: 0;
   text-align: center;
   width: 36px;
+  color: hsl(var(--muted-foreground));
 }
 
 .calendar-fixed .rdp-row {
   justify-content: space-around;
+}
+
+.calendar-fixed .rdp-day_selected {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 600;
+}
+
+.calendar-fixed .rdp-day_selected:hover {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.calendar-fixed .rdp-day_today {
+  border: 1px solid hsl(var(--primary) / 0.5);
+  background-color: transparent;
+  font-weight: 600;
+}
+
+.calendar-fixed .rdp-nav_button {
+  display: none; /* Hide default navigation buttons as we implement custom ones */
 }
 
 @media (max-width: 640px) {
