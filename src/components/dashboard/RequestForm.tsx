@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -58,18 +57,15 @@ const RequestForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Fetch potential approvers
   useEffect(() => {
     const fetchApprovers = async () => {
       try {
         console.log("Fetching approvers...");
         const users = await getAllUsers();
-        // Filter out the current user and show only users that could be approvers
         const filteredUsers = users.filter(u => u.id !== user?.id);
         console.log("Available approvers:", filteredUsers);
         setApprovers(filteredUsers);
         
-        // If the user has a default approver_id set, use it
         if (user && user.approver_id) {
           setSelectedApproverId(user.approver_id);
           console.log("Default approver set:", user.approver_id);
@@ -120,7 +116,6 @@ const RequestForm = () => {
     setIsSubmitting(true);
     
     try {
-      // Convertir fechas a formato ISO string para Supabase
       const startDate = date.from.toISOString().split('T')[0];
       const endDate = date.to.toISOString().split('T')[0];
       
@@ -139,7 +134,6 @@ const RequestForm = () => {
           description: "Solicitud de permiso enviada correctamente"
         });
         
-        // Resetear formulario
         setDate({ from: undefined, to: undefined });
         setLeaveType("");
         setReason("");
@@ -158,7 +152,6 @@ const RequestForm = () => {
     }
   };
 
-  // Función para formatear fechas en español
   const formatDate = (date: Date) => {
     return format(date, "d MMM yyyy", { locale: es });
   };

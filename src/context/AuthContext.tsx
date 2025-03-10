@@ -9,7 +9,8 @@ interface User {
   email: string;
   name?: string;
   department?: string;
-  role?: string;  // Added role property
+  role?: string;
+  approver_id?: string;
 }
 
 interface AuthContextType {
@@ -44,7 +45,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role
+              role: userProfile.role,
+              approver_id: userProfile.approver_id
             });
             setIsAuthenticated(true);
           }
@@ -69,7 +71,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               email: userProfile.email,
               name: userProfile.name,
               department: userProfile.department,
-              role: userProfile.role
+              role: userProfile.role,
+              approver_id: userProfile.approver_id
             });
             setIsAuthenticated(true);
           }

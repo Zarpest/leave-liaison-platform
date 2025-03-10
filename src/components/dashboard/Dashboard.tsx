@@ -38,7 +38,6 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Cambiado el orden: ahora RequestForm está antes que TeamCalendar */}
         <RequestForm />
         
         <TeamCalendar />
