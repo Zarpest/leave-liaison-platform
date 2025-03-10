@@ -47,6 +47,15 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const handleSettingsClick = () => {
+    navigate("/admin"); // Redirige al panel de administración
+  };
+
+  const handleProfileClick = () => {
+    // Por ahora, redirigimos al dashboard, pero en el futuro podría ser a una página de perfil
+    navigate("/");
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
@@ -75,11 +84,16 @@ const Navbar = () => {
             <Link to="/approvals" className="text-sm font-medium hover:text-primary btn-transition">
               Aprobaciones
             </Link>
+            {user?.role === 'super_admin' && (
+              <Link to="/admin" className="text-sm font-medium hover:text-primary btn-transition">
+                Administración
+              </Link>
+            )}
           </nav>
         )}
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={handleSettingsClick}>
             <SettingsIcon className="h-5 w-5" />
           </Button>
 
@@ -102,6 +116,9 @@ const Navbar = () => {
                   {user?.department && (
                     <p className="text-xs text-muted-foreground">{user.department}</p>
                   )}
+                  {user?.role && (
+                    <p className="text-xs text-muted-foreground font-semibold">Rol: {user.role}</p>
+                  )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -117,14 +134,20 @@ const Navbar = () => {
                 <UsersIcon className="mr-2 h-4 w-4" />
                 <span>Calendario de Equipo</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleProfileClick}>
                 <User2Icon className="mr-2 h-4 w-4" />
                 <span>Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSettingsClick}>
                 <SettingsIcon className="mr-2 h-4 w-4" />
                 <span>Configuración</span>
               </DropdownMenuItem>
+              {user?.role === 'super_admin' && (
+                <DropdownMenuItem onClick={() => navigate("/admin")}>
+                  <SettingsIcon className="mr-2 h-4 w-4" />
+                  <span>Administración</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOutIcon className="mr-2 h-4 w-4" />
@@ -158,6 +181,12 @@ const Navbar = () => {
                     <FileTextIcon className="h-5 w-5" />
                     Aprobaciones
                   </Link>
+                  {user?.role === 'super_admin' && (
+                    <Link to="/admin" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
+                      <SettingsIcon className="h-5 w-5" />
+                      Administración
+                    </Link>
+                  )}
                   <div className="border-t my-2"></div>
                   <button 
                     className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition text-left" 

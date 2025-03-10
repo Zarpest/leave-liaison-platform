@@ -9,7 +9,7 @@ export interface User {
   leave_balance?: LeaveBalance;
   approver?: string;
   approver_id?: string;
-  role?: string; // Now properly typed field for user role
+  role?: string; // Propiedad para el rol del usuario
 }
 
 export interface LeaveBalance {
@@ -34,7 +34,7 @@ export interface LeaveRequest {
   approver_id?: string;
 }
 
-// Check if user is super admin
+// Verificar si el usuario es super administrador
 export const isSuperAdmin = async (): Promise<boolean> => {
   const { data: { user } } = await supabase.auth.getUser();
   
@@ -54,7 +54,7 @@ export const isSuperAdmin = async (): Promise<boolean> => {
   return data.role === 'super_admin';
 };
 
-// Set user role
+// Establecer el rol de un usuario
 export const setUserRole = async (userId: string, role: string): Promise<void> => {
   const { error } = await supabase
     .from('profiles')
@@ -94,7 +94,13 @@ export const getAllUsers = async (): Promise<User[]> => {
     balanceMap[balance.user_id] = balance;
   });
   
-  // Combinar perfiles con sus balances
+  // Crear un mapa de nombres de usuarios para los aprobadores
+  const userNameMap: Record<string, string> = {};
+  profiles.forEach(profile => {
+    userNameMap[profile.id] = profile.name;
+  });
+  
+  // Combinar perfiles con sus balances y nombres de aprobadores
   const users: User[] = profiles.map(profile => ({
     id: profile.id,
     name: profile.name,
@@ -102,7 +108,7 @@ export const getAllUsers = async (): Promise<User[]> => {
     department: profile.department,
     leave_balance: balanceMap[profile.id],
     approver_id: profile.approver_id,
-    approver: profile.approver_id,
+    approver: profile.approver_id ? userNameMap[profile.approver_id] : undefined,
     role: profile.role
   }));
   

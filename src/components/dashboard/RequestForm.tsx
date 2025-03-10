@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SlideIn } from "@/components/animations/Transitions";
 import { createLeaveRequest } from "@/services/supabaseService";
 import { getAllUsers, User } from "@/services/adminService";
+import { useAuth } from "@/context/AuthContext";
 
 const leaveTypes = [
   { value: "Vacaciones", label: "Vacaciones" },
@@ -55,21 +56,38 @@ const RequestForm = () => {
   const [approvers, setApprovers] = useState<User[]>([]);
   const [selectedApproverId, setSelectedApproverId] = useState<string>("");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Fetch potential approvers
   useEffect(() => {
     const fetchApprovers = async () => {
       try {
+        console.log("Fetching approvers...");
         const users = await getAllUsers();
-        // Filter only users that could be approvers (you might want to refine this logic)
-        setApprovers(users);
+        // Filter out the current user and show only users that could be approvers
+        const filteredUsers = users.filter(u => u.id !== user?.id);
+        console.log("Available approvers:", filteredUsers);
+        setApprovers(filteredUsers);
+        
+        // If the user has a default approver_id set, use it
+        if (user && user.approver_id) {
+          setSelectedApproverId(user.approver_id);
+          console.log("Default approver set:", user.approver_id);
+        }
       } catch (error) {
         console.error("Error fetching approvers:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se pudieron cargar los aprobadores. Por favor, intenta de nuevo."
+        });
       }
     };
     
-    fetchApprovers();
-  }, []);
+    if (user) {
+      fetchApprovers();
+    }
+  }, [user, toast]);
 
   const businessDays = React.useMemo(() => {
     if (date.from && date.to) {
@@ -90,6 +108,15 @@ const RequestForm = () => {
       return;
     }
     
+    if (!selectedApproverId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Por favor, selecciona un aprobador para tu solicitud"
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -103,7 +130,7 @@ const RequestForm = () => {
         end_date: endDate,
         days: businessDays,
         comments: reason || undefined,
-        approver_id: selectedApproverId || undefined
+        approver_id: selectedApproverId
       });
       
       if (result) {
@@ -116,7 +143,6 @@ const RequestForm = () => {
         setDate({ from: undefined, to: undefined });
         setLeaveType("");
         setReason("");
-        setSelectedApproverId("");
       } else {
         throw new Error("No se pudo crear la solicitud");
       }
@@ -174,11 +200,17 @@ const RequestForm = () => {
                   <SelectValue placeholder="Selecciona un aprobador" />
                 </SelectTrigger>
                 <SelectContent>
-                  {approvers.map((approver) => (
-                    <SelectItem key={approver.id} value={approver.id}>
-                      {approver.name}
+                  {approvers.length > 0 ? (
+                    approvers.map((approver) => (
+                      <SelectItem key={approver.id} value={approver.id}>
+                        {approver.name} {approver.department ? `(${approver.department})` : ''}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-approvers" disabled>
+                      No hay aprobadores disponibles
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
             </div>

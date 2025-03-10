@@ -7,6 +7,7 @@ export interface User {
   email: string;
   department: string;
   approver_id?: string;
+  role?: string; // Añadido para compatibilidad con el rol de administrador
 }
 
 export interface LeaveBalance {
