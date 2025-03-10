@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -48,12 +47,11 @@ const Navbar = () => {
   };
 
   const handleSettingsClick = () => {
-    navigate("/admin"); // Redirige al panel de administración
+    navigate("/profile"); // Redirige a la página de perfil
   };
 
   const handleProfileClick = () => {
-    // Por ahora, redirigimos al dashboard, pero en el futuro podría ser a una página de perfil
-    navigate("/");
+    navigate("/profile"); // Redirige a la página de perfil
   };
 
   return (
@@ -138,10 +136,6 @@ const Navbar = () => {
                 <User2Icon className="mr-2 h-4 w-4" />
                 <span>Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSettingsClick}>
-                <SettingsIcon className="mr-2 h-4 w-4" />
-                <span>Configuración</span>
-              </DropdownMenuItem>
               {user?.role === 'super_admin' && (
                 <DropdownMenuItem onClick={() => navigate("/admin")}>
                   <SettingsIcon className="mr-2 h-4 w-4" />
@@ -180,6 +174,10 @@ const Navbar = () => {
                   <Link to="/approvals" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
                     <FileTextIcon className="h-5 w-5" />
                     Aprobaciones
+                  </Link>
+                  <Link to="/profile" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>
+                    <User2Icon className="h-5 w-5" />
+                    Mi Perfil
                   </Link>
                   {user?.role === 'super_admin' && (
                     <Link to="/admin" className="flex items-center gap-2 p-2 rounded-md hover:bg-secondary btn-transition" onClick={closeMobileMenu}>

@@ -14,7 +14,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import DetailedHistory from "./pages/DetailedHistory";
+import ProfilePage from "./pages/ProfilePage";
 import RequireAuth from "./components/auth/RequireAuth";
+import RequireAdmin from "./components/auth/RequireAdmin";
 
 const queryClient = new QueryClient();
 
@@ -36,7 +38,8 @@ const App = () => (
             <Route path="/requests/:id" element={<RequireAuth><DetailedHistory /></RequireAuth>} />
             <Route path="/team" element={<RequireAuth><TeamPage /></RequireAuth>} />
             <Route path="/approvals" element={<RequireAuth><Approvals /></RequireAuth>} />
-            <Route path="/admin" element={<RequireAuth><AdminPanel /></RequireAuth>} />
+            <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+            <Route path="/admin" element={<RequireAdmin><AdminPanel /></RequireAdmin>} />
             
             {/* Ruta no encontrada */}
             <Route path="*" element={<NotFound />} />

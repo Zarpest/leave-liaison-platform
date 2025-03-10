@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface User {
@@ -196,4 +195,19 @@ export const updateLeaveRequestStatus = async (
     console.error('Error al actualizar solicitud:', error);
     throw error;
   }
+};
+
+// Obtener posibles aprobadores (todos los usuarios excepto el actual)
+export const getPossibleApprovers = async (currentUserId: string): Promise<User[]> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, name, department')
+    .neq('id', currentUserId);
+    
+  if (error) {
+    console.error('Error al obtener aprobadores:', error);
+    throw error;
+  }
+  
+  return data as User[];
 };

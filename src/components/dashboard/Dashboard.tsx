@@ -38,10 +38,10 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <RequestForm />
-          <TeamCalendar />
-        </div>
+        {/* Cambiado el orden: ahora RequestForm está antes que TeamCalendar */}
+        <RequestForm />
+        
+        <TeamCalendar />
 
         <LeaveHistory />
       </StaggerChildren>
