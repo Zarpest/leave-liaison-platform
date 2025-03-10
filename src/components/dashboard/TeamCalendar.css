@@ -70,6 +70,22 @@
   display: none; /* Hide default navigation buttons as we implement custom ones */
 }
 
+/* Add more space between calendar days */
+.calendar-fixed .rdp-tbody {
+  padding-top: 0.5rem;
+}
+
+.calendar-fixed .rdp-month {
+  margin: 0;
+  padding-bottom: 1rem;
+}
+
+/* Give more vertical space to the calendar */
+.calendar-fixed {
+  min-height: 330px;
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 640px) {
   .calendar-fixed .rdp-button {
     width: 32px;
@@ -79,5 +95,10 @@
   
   .calendar-fixed .rdp-head_cell {
     width: 32px;
+  }
+
+  /* Adjust spacing for mobile */
+  .calendar-fixed {
+    min-height: 300px;
   }
 }

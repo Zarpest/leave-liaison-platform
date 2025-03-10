@@ -171,7 +171,7 @@ const TeamCalendar = () => {
             <div className="grid md:grid-cols-7 gap-6">
               <div className="md:col-span-3">
                 <div className="w-full">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-6">
                     <button 
                       onClick={goToPreviousMonth}
                       className="p-1 rounded-full hover:bg-muted transition-colors"
@@ -190,46 +190,48 @@ const TeamCalendar = () => {
                       <ChevronRight className="h-5 w-5" />
                     </button>
                   </div>
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={(newDate) => newDate && setDate(newDate)}
-                    className="rounded-md border w-full calendar-fixed"
-                    month={currentMonth}
-                    onMonthChange={setCurrentMonth}
-                    modifiers={{
-                      highlight: (date) => hasEventOnDate(date)
-                    }}
-                    modifiersStyles={{
-                      highlight: {
-                        backgroundColor: "hsl(var(--primary) / 0.15)",
-                        color: "hsl(var(--primary))",
-                        fontWeight: "500",
-                        borderRadius: "9999px"
-                      }
-                    }}
-                    components={{
-                      DayContent: (props) => {
-                        const eventCount = getEventCountForDate(props.date);
-                        return (
-                          <div className="relative w-full h-full flex items-center justify-center">
-                            <div>{props.date.getDate()}</div>
-                            {eventCount > 0 && (
-                              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex gap-[1px]">
-                                {eventCount > 3 ? (
-                                  <div className="w-1 h-1 bg-primary rounded-full" />
-                                ) : (
-                                  Array.from({ length: Math.min(eventCount, 3) }).map((_, i) => (
-                                    <div key={i} className="w-1 h-1 bg-primary rounded-full" />
-                                  ))
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
-                    }}
-                  />
+                  <div className="mb-8 pb-4">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={(newDate) => newDate && setDate(newDate)}
+                      className="rounded-md border w-full calendar-fixed"
+                      month={currentMonth}
+                      onMonthChange={setCurrentMonth}
+                      modifiers={{
+                        highlight: (date) => hasEventOnDate(date)
+                      }}
+                      modifiersStyles={{
+                        highlight: {
+                          backgroundColor: "hsl(var(--primary) / 0.15)",
+                          color: "hsl(var(--primary))",
+                          fontWeight: "500",
+                          borderRadius: "9999px"
+                        }
+                      }}
+                      components={{
+                        DayContent: (props) => {
+                          const eventCount = getEventCountForDate(props.date);
+                          return (
+                            <div className="relative w-full h-full flex items-center justify-center">
+                              <div>{props.date.getDate()}</div>
+                              {eventCount > 0 && (
+                                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex gap-[1px]">
+                                  {eventCount > 3 ? (
+                                    <div className="w-1 h-1 bg-primary rounded-full" />
+                                  ) : (
+                                    Array.from({ length: Math.min(eventCount, 3) }).map((_, i) => (
+                                      <div key={i} className="w-1 h-1 bg-primary rounded-full" />
+                                    ))
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
               
@@ -253,84 +255,86 @@ const TeamCalendar = () => {
                   )}
                 </div>
 
-                {view === "calendar" ? (
-                  <div className="space-y-3">
-                    {eventsForSelectedDate.length > 0 ? (
-                      eventsForSelectedDate.map((event) => (
-                        <div key={event.id} className="flex items-center p-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors shadow-sm">
-                          <Avatar className="h-10 w-10 mr-3 border border-primary/10">
-                            <AvatarImage src="" alt={event.username} />
-                            <AvatarFallback className="bg-primary/10 text-primary">{event.username.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium">{event.username}</p>
-                            <div className="flex flex-wrap items-center gap-2 mt-1">
-                              <Badge variant="secondary" className="text-xs font-normal py-0 px-1.5">{event.type}</Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {format(event.startDate, "d MMM", { locale: es })} 
-                                {!isSameDay(event.startDate, event.endDate) && 
-                                  ` - ${format(event.endDate, "d MMM", { locale: es })}`}
-                              </span>
-                            </div>
-                          </div>
-                          <StatusBadge status={event.status as any} className="ml-2" />
-                        </div>
-                      ))
-                    ) : (
-                      <div className="py-8 text-center border rounded-lg bg-muted/20">
-                        <CalendarClock className="h-10 w-10 text-muted-foreground/50 mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                          Nadie tiene permiso para la fecha seleccionada.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {Array.from(new Set(teamData.map(event => event.username))).map(username => {
-                      const userEvents = teamData.filter(event => 
-                        event.username === username && 
-                        event.status === 'approved' &&
-                        (isSameMonth(event.startDate, date) || 
-                         isSameMonth(event.endDate, date))
-                      );
-                      
-                      return userEvents.length > 0 ? (
-                        <div key={username as string} className="border rounded-lg overflow-hidden shadow-sm hover:shadow transition-shadow duration-200">
-                          <div className="flex items-center gap-3 p-3 bg-muted/40">
-                            <Avatar className="h-8 w-8 border border-primary/10">
-                              <AvatarImage src="" alt={username as string} />
-                              <AvatarFallback className="bg-primary/10 text-primary">
-                                {(username as string).split(' ').map(n => n[0]).join('')}
-                              </AvatarFallback>
+                <div className="mt-8">
+                  {view === "calendar" ? (
+                    <div className="space-y-3">
+                      {eventsForSelectedDate.length > 0 ? (
+                        eventsForSelectedDate.map((event) => (
+                          <div key={event.id} className="flex items-center p-3 rounded-lg border bg-background hover:bg-muted/50 transition-colors shadow-sm">
+                            <Avatar className="h-10 w-10 mr-3 border border-primary/10">
+                              <AvatarImage src="" alt={event.username} />
+                              <AvatarFallback className="bg-primary/10 text-primary">{event.username.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
                             </Avatar>
-                            <div>
-                              <p className="text-sm font-medium">{username}</p>
-                              <p className="text-xs text-muted-foreground">{userEvents[0].department || 'Sin departamento'}</p>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium">{event.username}</p>
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                                <Badge variant="secondary" className="text-xs font-normal py-0 px-1.5">{event.type}</Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {format(event.startDate, "d MMM", { locale: es })} 
+                                  {!isSameDay(event.startDate, event.endDate) && 
+                                    ` - ${format(event.endDate, "d MMM", { locale: es })}`}
+                                </span>
+                              </div>
+                            </div>
+                            <StatusBadge status={event.status as any} className="ml-2" />
+                          </div>
+                        ))
+                      ) : (
+                        <div className="py-8 text-center border rounded-lg bg-muted/20">
+                          <CalendarClock className="h-10 w-10 text-muted-foreground/50 mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Nadie tiene permiso para la fecha seleccionada.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {Array.from(new Set(teamData.map(event => event.username))).map(username => {
+                        const userEvents = teamData.filter(event => 
+                          event.username === username && 
+                          event.status === 'approved' &&
+                          (isSameMonth(event.startDate, date) || 
+                           isSameMonth(event.endDate, date))
+                        );
+                        
+                        return userEvents.length > 0 ? (
+                          <div key={username as string} className="border rounded-lg overflow-hidden shadow-sm hover:shadow transition-shadow duration-200">
+                            <div className="flex items-center gap-3 p-3 bg-muted/40">
+                              <Avatar className="h-8 w-8 border border-primary/10">
+                                <AvatarImage src="" alt={username as string} />
+                                <AvatarFallback className="bg-primary/10 text-primary">
+                                  {(username as string).split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-sm font-medium">{username}</p>
+                                <p className="text-xs text-muted-foreground">{userEvents[0].department || 'Sin departamento'}</p>
+                              </div>
+                            </div>
+                            <div className="divide-y">
+                              {userEvents.map((event) => (
+                                <div key={event.id} className="flex justify-between items-center p-3 hover:bg-muted/20 transition-colors">
+                                  <div>
+                                    <p className="text-sm">
+                                      <Badge variant="secondary" className="text-xs font-normal py-0 px-1.5 mr-1">{event.type}</Badge>
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {format(event.startDate, "d MMM", { locale: es })} 
+                                      {!isSameDay(event.startDate, event.endDate) && 
+                                        ` - ${format(event.endDate, "d MMM", { locale: es })}`}
+                                    </p>
+                                  </div>
+                                  <StatusBadge status={event.status as any} />
+                                </div>
+                              ))}
                             </div>
                           </div>
-                          <div className="divide-y">
-                            {userEvents.map((event) => (
-                              <div key={event.id} className="flex justify-between items-center p-3 hover:bg-muted/20 transition-colors">
-                                <div>
-                                  <p className="text-sm">
-                                    <Badge variant="secondary" className="text-xs font-normal py-0 px-1.5 mr-1">{event.type}</Badge>
-                                  </p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {format(event.startDate, "d MMM", { locale: es })} 
-                                    {!isSameDay(event.startDate, event.endDate) && 
-                                      ` - ${format(event.endDate, "d MMM", { locale: es })}`}
-                                  </p>
-                                </div>
-                                <StatusBadge status={event.status as any} />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : null;
-                    })}
-                  </div>
-                )}
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

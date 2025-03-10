@@ -36,7 +36,9 @@ const TeamPage = () => {
             </CardContent>
           </Card>
           
-          <TeamCalendar />
+          <div className="py-4">
+            <TeamCalendar />
+          </div>
           
           <div className="text-sm text-muted-foreground flex items-center gap-2 p-3 border rounded-md bg-muted/30">
             <CalendarClock className="h-4 w-4" />
