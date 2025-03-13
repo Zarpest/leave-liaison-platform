@@ -2,7 +2,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { isSuperAdmin } from '@/services/adminService';
+import { isSuperAdmin } from '@/services/roleService';
 
 interface RequireAdminProps {
   children: ReactNode;

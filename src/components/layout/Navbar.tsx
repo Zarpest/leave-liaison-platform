@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { isSuperAdmin } from "@/services/adminService";
+import { isSuperAdmin } from "@/services/roleService";
 import { AppLogo } from "./AppLogo";
 import { DesktopNav } from "./DesktopNav";
 import { MobileNav } from "./MobileNav";
