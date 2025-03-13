@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./components/dashboard/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
 import DetailedHistory from "./pages/DetailedHistory";
 import Requests from "./pages/Requests";
@@ -25,7 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/dashboard" element={<RequireAuth><ProfilePage /></RequireAuth>} />
           <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
           <Route path="/history" element={<RequireAuth><DetailedHistory /></RequireAuth>} />
           <Route path="/requests" element={<RequireAuth><Requests /></RequireAuth>} />
