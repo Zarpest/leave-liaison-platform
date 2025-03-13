@@ -40,7 +40,7 @@ import { useEffect, useState as useReactState } from "react";
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
   const [isSuperAdminUser, setIsSuperAdminUser] = useReactState(false);
 
