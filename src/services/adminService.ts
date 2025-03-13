@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export interface User {
@@ -210,4 +211,71 @@ export const getPossibleApprovers = async (currentUserId: string): Promise<User[
   }
   
   return data as User[];
+};
+
+// Crear un nuevo usuario en el sistema
+export const createUser = async (
+  email: string, 
+  password: string, 
+  name: string, 
+  department?: string,
+  role?: string
+): Promise<string> => {
+  // Primero creamos el usuario en auth
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { name, department }
+  });
+  
+  if (authError) {
+    console.error('Error al crear usuario en auth:', authError);
+    throw authError;
+  }
+  
+  // Si se especificó un rol, lo asignamos
+  if (role && authData.user) {
+    try {
+      await setUserRole(authData.user.id, role);
+    } catch (error) {
+      console.error('Error al asignar rol:', error);
+    }
+  }
+  
+  return authData.user?.id || '';
+};
+
+// Actualizar la contraseña de un usuario
+export const updateUserPassword = async (userId: string, newPassword: string): Promise<void> => {
+  const { error } = await supabase.auth.admin.updateUserById(
+    userId,
+    { password: newPassword }
+  );
+  
+  if (error) {
+    console.error('Error al actualizar contraseña:', error);
+    throw error;
+  }
+};
+
+// Promover a un usuario a super administrador
+export const promoteToSuperAdmin = async (userId: string): Promise<void> => {
+  await setUserRole(userId, 'super_admin');
+};
+
+// Verificar si se necesita configurar un super administrador
+export const checkSuperAdminExists = async (): Promise<boolean> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('role', 'super_admin')
+    .limit(1);
+    
+  if (error) {
+    console.error('Error al verificar super admin:', error);
+    return false;
+  }
+  
+  return data && data.length > 0;
 };
