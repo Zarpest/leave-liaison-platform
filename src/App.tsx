@@ -13,7 +13,7 @@ import AdminPanel from "./pages/AdminPanel";
 import SuperAdminPanel from "./pages/SuperAdminPanel";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
-import { RequireAuth } from "./components/auth/RequireAuth";
+import RequireAuth from "./components/auth/RequireAuth";
 import { Toaster } from "sonner";
 
 function App() {

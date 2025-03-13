@@ -9,7 +9,7 @@ interface RequireAdminProps {
 }
 
 export const RequireAdmin: React.FC<RequireAdminProps> = ({ children }) => {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
 
@@ -32,12 +32,12 @@ export const RequireAdmin: React.FC<RequireAdminProps> = ({ children }) => {
       }
     };
 
-    if (!isLoading) {
+    if (!loading) {
       checkAdminStatus();
     }
-  }, [user, isLoading]);
+  }, [user, loading]);
 
-  if (isLoading || checkingAdmin) {
+  if (loading || checkingAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -51,3 +51,5 @@ export const RequireAdmin: React.FC<RequireAdminProps> = ({ children }) => {
 
   return <>{children}</>;
 };
+
+export default RequireAdmin;
