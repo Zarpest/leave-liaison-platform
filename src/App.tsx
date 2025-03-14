@@ -13,13 +13,14 @@ import SuperAdminPanel from "./pages/SuperAdminPanel";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import RequireAuth from "./components/auth/RequireAuth";
+import RequireAdmin from "./components/auth/RequireAdmin";
 import { Toaster } from "sonner";
 
 function App() {
   console.log("App component rendering");
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
@@ -32,13 +33,19 @@ function App() {
           <Route path="/team" element={<RequireAuth><TeamPage /></RequireAuth>} />
           <Route path="/approvals" element={<RequireAuth><Approvals /></RequireAuth>} />
           <Route path="/admin" element={<RequireAuth><AdminPanel /></RequireAuth>} />
-          <Route path="/superadmin" element={<RequireAuth><SuperAdminPanel /></RequireAuth>} />
+          <Route path="/superadmin" element={
+            <RequireAuth>
+              <RequireAdmin>
+                <SuperAdminPanel />
+              </RequireAdmin>
+            </RequireAuth>
+          } />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Router>
-      <Toaster position="top-right" />
-    </AuthProvider>
+        <Toaster position="top-right" />
+      </AuthProvider>
+    </Router>
   );
 }
 
