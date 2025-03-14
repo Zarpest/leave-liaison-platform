@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { setUserRole } from "./roleService"; // Add this import to fix the error
+import { setUserRole } from "./roleService"; // Import the function correctly
 
 export interface User {
   id: string;
