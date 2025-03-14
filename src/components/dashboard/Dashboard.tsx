@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import LeaveBalanceCard from "./LeaveBalanceCard";
 import RequestForm from "./RequestForm";
 import LeaveHistory from "./LeaveHistory";
@@ -7,6 +7,12 @@ import TeamCalendar from "./TeamCalendar";
 import { StaggerChildren } from "@/components/animations/Transitions";
 
 const Dashboard = () => {
+  console.log("Dashboard component rendering");
+  
+  useEffect(() => {
+    console.log("Dashboard mounted");
+  }, []);
+  
   return (
     <div className="space-y-8">
       <div>

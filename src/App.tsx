@@ -16,6 +16,7 @@ import RequireAuth from "./components/auth/RequireAuth";
 import { Toaster } from "sonner";
 
 function App() {
+  console.log("App component rendering");
   return (
     <AuthProvider>
       <Router>
