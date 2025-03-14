@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { addMonths, subMonths, parseISO, addDays, isAfter, isBefore } from "date-fns";
 import { getAllTeamRequests } from "@/services/supabaseService";
 
@@ -32,7 +32,9 @@ const useTeamCalendar = () => {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
 
+  // Fetch team data only once when component mounts
   useEffect(() => {
+    let isMounted = true;
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -45,27 +47,35 @@ const useTeamCalendar = () => {
           endDate: parseISO(request.end_date)
         }));
         
-        setTeamData(formattedRequests);
+        if (isMounted) {
+          setTeamData(formattedRequests);
+          setLoading(false);
+        }
       } catch (error) {
         console.error("Error fetching team data:", error);
-      } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Navigate between months
-  const goToPreviousMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
-  };
+  // Navigate between months - memoized with useCallback
+  const goToPreviousMonth = useCallback(() => {
+    setCurrentMonth(prevMonth => subMonths(prevMonth, 1));
+  }, []);
 
-  const goToNextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
-  };
+  const goToNextMonth = useCallback(() => {
+    setCurrentMonth(prevMonth => addMonths(prevMonth, 1));
+  }, []);
 
-  // Extract unique values for filters
+  // Extract unique values for filters - memoized to prevent recalculation
   const availableTypes = useMemo(() => {
     const types = new Set(teamData.map(event => event.type));
     return Array.from(types);
@@ -76,7 +86,7 @@ const useTeamCalendar = () => {
     return Array.from(departments) as string[];
   }, [teamData]);
 
-  // Filter team data
+  // Filter team data - memoized to prevent recalculation
   const filteredTeamData = useMemo(() => {
     return teamData.filter(event => {
       // Apply type filter
@@ -89,7 +99,7 @@ const useTeamCalendar = () => {
     });
   }, [teamData, typeFilter, departmentFilter]);
 
-  // Get upcoming leaves for the next 30 days
+  // Get upcoming leaves for the next 30 days - memoized to prevent recalculation
   const upcomingLeaves = useMemo(() => {
     const today = new Date();
     const futureDate = addDays(today, 30);

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import { CalendarDays, Users, Filter } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -87,4 +87,5 @@ const CalendarViewSelector = ({
   );
 };
 
-export default CalendarViewSelector;
+// Memoize the component to prevent unnecessary re-renders
+export default memo(CalendarViewSelector);

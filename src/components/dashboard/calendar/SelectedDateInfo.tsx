@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
@@ -32,4 +32,5 @@ const SelectedDateInfo = ({ date, eventsCount }: SelectedDateInfoProps) => {
   );
 };
 
-export default SelectedDateInfo;
+// Memoize the component to avoid re-renders when props haven't changed
+export default memo(SelectedDateInfo);

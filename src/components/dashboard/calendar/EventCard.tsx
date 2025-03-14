@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -43,4 +43,5 @@ const EventCard = ({ event }: EventCardProps) => {
   );
 };
 
-export default EventCard;
+// Memoize the component to prevent unnecessary re-renders
+export default memo(EventCard);

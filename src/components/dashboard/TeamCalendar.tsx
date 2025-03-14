@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { CalendarClock, BarChart } from "lucide-react";
 import { SlideIn } from "@/components/animations/Transitions";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CalendarViewSelector from "./calendar/CalendarViewSelector";
 import CalendarView from "./calendar/CalendarView";
 import ListView from "./calendar/ListView";
@@ -109,4 +108,5 @@ const TeamCalendar = () => {
   );
 };
 
-export default TeamCalendar;
+// Memoize the entire TeamCalendar component
+export default memo(TeamCalendar);

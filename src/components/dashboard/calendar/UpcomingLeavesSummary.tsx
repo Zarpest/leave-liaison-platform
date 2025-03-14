@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo, useMemo } from "react";
 import { format, addDays, isAfter, isBefore, differenceInCalendarDays } from "date-fns";
 import { es } from "date-fns/locale";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -22,19 +22,21 @@ interface UpcomingLeavesSummaryProps {
 }
 
 const UpcomingLeavesSummary = ({ events, daysToShow = 30 }: UpcomingLeavesSummaryProps) => {
-  const today = new Date();
-  const futureDate = addDays(today, daysToShow);
+  // Filter events to get only upcoming ones that are approved - memoized for performance
+  const upcomingEvents = useMemo(() => {
+    const today = new Date();
+    const futureDate = addDays(today, daysToShow);
 
-  // Filter events to get only upcoming ones that are approved
-  const upcomingEvents = events
-    .filter(event => {
-      return (
-        event.status === 'approved' &&
-        (isAfter(event.startDate, today) || isAfter(event.endDate, today)) &&
-        isBefore(event.startDate, futureDate)
-      );
-    })
-    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+    return events
+      .filter(event => {
+        return (
+          event.status === 'approved' &&
+          (isAfter(event.startDate, today) || isAfter(event.endDate, today)) &&
+          isBefore(event.startDate, futureDate)
+        );
+      })
+      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+  }, [events, daysToShow]);
 
   if (upcomingEvents.length === 0) {
     return (
@@ -82,4 +84,5 @@ const UpcomingLeavesSummary = ({ events, daysToShow = 30 }: UpcomingLeavesSummar
   );
 };
 
-export default UpcomingLeavesSummary;
+// Memoize the component to prevent unnecessary re-renders
+export default memo(UpcomingLeavesSummary);

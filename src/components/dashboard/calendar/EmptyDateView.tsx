@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import { CalendarClock, Filter } from "lucide-react";
 
 interface EmptyDateViewProps {
@@ -31,4 +31,5 @@ const EmptyDateView = ({ hasActiveFilters = false }: EmptyDateViewProps) => {
   );
 };
 
-export default EmptyDateView;
+// Memoize the component since it doesn't need to re-render often
+export default memo(EmptyDateView);

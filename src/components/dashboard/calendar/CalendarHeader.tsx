@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { memo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -38,4 +38,5 @@ const CalendarHeader = ({
   );
 };
 
-export default CalendarHeader;
+// Memoize the component
+export default memo(CalendarHeader);
