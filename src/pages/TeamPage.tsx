@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Calendar, CalendarClock, Users } from "lucide-react";
+import { Calendar, CalendarClock, Users, Filter } from "lucide-react";
 
 const TeamPage = () => {
   return (
@@ -31,7 +31,8 @@ const TeamPage = () => {
             <CardContent className="p-4 flex gap-2 items-center">
               <Users className="h-5 w-5 text-primary" />
               <p className="text-sm text-muted-foreground">
-                Este calendario muestra la disponibilidad de todos los miembros del equipo. Los días marcados indican permisos aprobados.
+                Este calendario muestra la disponibilidad de todos los miembros del equipo. 
+                Utiliza los filtros para ver permisos por tipo o departamento.
               </p>
             </CardContent>
           </Card>
@@ -40,9 +41,16 @@ const TeamPage = () => {
             <TeamCalendar />
           </div>
           
-          <div className="text-sm text-muted-foreground flex items-center gap-2 p-3 border rounded-md bg-muted/30">
-            <CalendarClock className="h-4 w-4" />
-            <p>Nota: El calendario muestra únicamente las solicitudes aprobadas.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2 p-3 border rounded-md bg-muted/30">
+              <CalendarClock className="h-4 w-4" />
+              <p>Nota: El calendario muestra únicamente las solicitudes aprobadas.</p>
+            </div>
+            
+            <div className="flex items-center gap-2 p-3 border rounded-md bg-muted/30">
+              <Filter className="h-4 w-4" />
+              <p>Usa los filtros para mostrar permisos específicos por tipo o departamento.</p>
+            </div>
           </div>
         </div>
       </PageTransition>

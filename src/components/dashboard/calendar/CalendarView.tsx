@@ -14,6 +14,7 @@ interface Event {
   status: string;
   startDate: Date;
   endDate: Date;
+  department?: string;
 }
 
 interface CalendarViewProps {
@@ -22,6 +23,8 @@ interface CalendarViewProps {
   setDate: (date: Date) => void;
   currentMonth: Date;
   setCurrentMonth: (month: Date) => void;
+  typeFilter: string;
+  departmentFilter: string;
 }
 
 const CalendarView = ({ 
@@ -29,8 +32,24 @@ const CalendarView = ({
   date, 
   setDate, 
   currentMonth,
-  setCurrentMonth
+  setCurrentMonth,
+  typeFilter,
+  departmentFilter
 }: CalendarViewProps) => {
+  // Filter data based on selected filters
+  const filteredTeamData = teamData.filter(event => {
+    // Only include approved events
+    if (event.status !== 'approved') return false;
+    
+    // Apply type filter
+    if (typeFilter !== 'all' && event.type !== typeFilter) return false;
+    
+    // Apply department filter
+    if (departmentFilter !== 'all' && event.department !== departmentFilter) return false;
+    
+    return true;
+  });
+
   // Navigate between months
   const goToPreviousMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
@@ -51,10 +70,7 @@ const CalendarView = ({
   };
 
   // Find events for the selected date
-  const eventsForSelectedDate = teamData.filter(event => {
-    // Only include approved events
-    if (event.status !== 'approved') return false;
-    
+  const eventsForSelectedDate = filteredTeamData.filter(event => {
     try {
       return isDateInRange(date, event.startDate, event.endDate);
     } catch (error) {
@@ -65,8 +81,7 @@ const CalendarView = ({
 
   // Get count of people with approved time off on a specific date
   const getEventCountForDate = (date: Date) => {
-    return teamData.filter(event => {
-      if (event.status !== 'approved') return false;
+    return filteredTeamData.filter(event => {
       try {
         return isDateInRange(date, event.startDate, event.endDate);
       } catch (error) {
@@ -77,10 +92,7 @@ const CalendarView = ({
 
   // Dynamic style for days with events
   const hasEventOnDate = (date: Date) => {
-    return teamData.some(event => {
-      // Only mark dates with approved events
-      if (event.status !== 'approved') return false;
-      
+    return filteredTeamData.some(event => {
       try {
         return isDateInRange(date, event.startDate, event.endDate);
       } catch (error) {
