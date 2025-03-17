@@ -1,5 +1,5 @@
 
-import React, { memo } from "react";
+import React, { memo, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -15,6 +15,9 @@ const CalendarHeader = ({
   goToPreviousMonth, 
   goToNextMonth 
 }: CalendarHeaderProps) => {
+  // Formateamos el mes actual solo cuando cambia el currentMonth
+  const formattedMonth = format(currentMonth, "MMMM yyyy", { locale: es });
+  
   return (
     <div className="flex items-center justify-between mb-6">
       <button 
@@ -24,8 +27,8 @@ const CalendarHeader = ({
       >
         <ChevronLeft className="h-5 w-5" />
       </button>
-      <h3 className="text-sm font-medium">
-        {format(currentMonth, "MMMM yyyy", { locale: es })}
+      <h3 className="text-sm font-medium capitalize">
+        {formattedMonth}
       </h3>
       <button 
         onClick={goToNextMonth}
@@ -38,5 +41,5 @@ const CalendarHeader = ({
   );
 };
 
-// Memoize the component
+// Memoize el componente para evitar renderizados innecesarios
 export default memo(CalendarHeader);

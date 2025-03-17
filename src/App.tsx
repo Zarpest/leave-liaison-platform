@@ -32,7 +32,7 @@ function App() {
           <Route path="/requests" element={<RequireAuth><Requests /></RequireAuth>} />
           <Route path="/team" element={<RequireAuth><TeamPage /></RequireAuth>} />
           <Route path="/approvals" element={<RequireAuth><Approvals /></RequireAuth>} />
-          <Route path="/admin" element={<RequireAuth><AdminPanel /></RequireAuth>} />
+          <Route path="/admin" element={<RequireAuth><RequireAdmin><AdminPanel /></RequireAdmin></RequireAuth>} />
           <Route path="/superadmin" element={
             <RequireAuth>
               <RequireAdmin>

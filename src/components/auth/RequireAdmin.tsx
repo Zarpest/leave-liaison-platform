@@ -8,7 +8,7 @@ interface RequireAdminProps {
   children: ReactNode;
 }
 
-export const RequireAdmin: React.FC<RequireAdminProps> = ({ children }) => {
+const RequireAdmin: React.FC<RequireAdminProps> = ({ children }) => {
   const { user, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [checkingAdmin, setCheckingAdmin] = useState(true);

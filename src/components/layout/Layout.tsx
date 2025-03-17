@@ -23,13 +23,13 @@ const Layout = ({ children, className }: LayoutProps) => {
             Plataforma de Gestión de Permisos © {new Date().getFullYear()}
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground btn-transition">
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Privacidad
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground btn-transition">
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Términos
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground btn-transition">
+            <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Soporte
             </a>
           </div>
