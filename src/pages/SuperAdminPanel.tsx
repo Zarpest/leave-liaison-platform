@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { PageTransition } from "@/components/animations/Transitions";
@@ -68,7 +67,7 @@ import {
   setUserRole,
   promoteToSuperAdmin
 } from "@/services/adminService";
-import { RequireAdmin } from "@/components/auth/RequireAdmin";
+import RequireAdmin from "@/components/auth/RequireAdmin";
 
 // Schema para el formulario de edición de usuario
 const editUserSchema = z.object({
@@ -414,34 +413,33 @@ const SuperAdminPanel = () => {
   ];
 
   return (
-    <RequireAdmin>
-      <Layout>
-        <PageTransition>
-          <div className="space-y-8">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Panel de Super Administrador</h1>
-              <p className="text-muted-foreground mt-1">
-                Gestión completa de usuarios, departamentos, permisos y configuración del sistema
-              </p>
-            </div>
+    <Layout>
+      <PageTransition>
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Panel de Super Administrador</h1>
+            <p className="text-muted-foreground mt-1">
+              Gestión completa de usuarios, departamentos, permisos y configuración del sistema
+            </p>
+          </div>
 
-            <Tabs defaultValue="users" className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6">
-                <TabsTrigger value="users">
-                  <UsersIcon className="mr-2 h-4 w-4" />
-                  Usuarios
-                </TabsTrigger>
-                <TabsTrigger value="departments">
-                  <UserCogIcon className="mr-2 h-4 w-4" />
-                  Departamentos
-                </TabsTrigger>
-                <TabsTrigger value="leaves">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  Solicitudes
-                </TabsTrigger>
-              </TabsList>
+          <Tabs defaultValue="users" className="w-full">
+            <TabsList className="grid grid-cols-3 mb-6">
+              <TabsTrigger value="users">
+                <UsersIcon className="mr-2 h-4 w-4" />
+                Usuarios
+              </TabsTrigger>
+              <TabsTrigger value="departments">
+                <UserCogIcon className="mr-2 h-4 w-4" />
+                Departamentos
+              </TabsTrigger>
+              <TabsTrigger value="leaves">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                Solicitudes
+              </TabsTrigger>
+            </TabsList>
 
-              {/* Pestaña de usuarios */}
+            {/* Pestaña de usuarios */}
               <TabsContent value="users">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
@@ -987,73 +985,4 @@ const SuperAdminPanel = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Rol</FormLabel>
-                        <FormControl>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccionar rol" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {roles.map((role) => (
-                                <SelectItem key={role.id} value={role.id}>
-                                  {role.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type="submit">
-                      <UserPlusIcon className="mr-2 h-4 w-4" />
-                      Crear Usuario
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-
-          {/* Diálogo para cambiar contraseña */}
-          <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-            <DialogContent className="sm:max-w-[400px]">
-              <DialogHeader>
-                <DialogTitle>Cambiar Contraseña</DialogTitle>
-                <DialogDescription>
-                  Ingresa la nueva contraseña para el usuario {selectedUser?.name}.
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...passwordForm}>
-                <form onSubmit={passwordForm.handleSubmit(onSubmitPassword)} className="space-y-4">
-                  <FormField
-                    control={passwordForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nueva Contraseña</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type="submit">
-                      <KeyIcon className="mr-2 h-4 w-4" />
-                      Actualizar Contraseña
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </PageTransition>
-      </Layout>
-    </RequireAdmin>
-  );
-};
-
-export default SuperAdminPanel;
+                        <
