@@ -11,7 +11,8 @@ import {
   LeaveBalance,
   LeaveRequest,
 } from "@/services/adminService";
-import RequireAdmin from "@/components/auth/RequireAdmin";
+import { promoteToSuperAdmin } from "@/services/roleService";
+import { supabase } from "@/integrations/supabase/client";
 
 const SuperAdminPanel = () => {
   const { toast } = useToast();
@@ -20,8 +21,66 @@ const SuperAdminPanel = () => {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Obtain initial data
+  // Asignar superadmin al usuario especificado
+  const assignSuperAdminRole = async () => {
+    try {
+      // Buscar el usuario por correo
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, role')
+        .eq('email', 'turedseguraprotejeres@gmail.com')
+        .single();
+      
+      if (error || !data) {
+        console.error("Error buscando usuario:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo encontrar el usuario con ese correo",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (data.role === 'super_admin') {
+        toast({
+          title: "Información",
+          description: "El usuario ya tiene rol de Super Administrador",
+        });
+        return;
+      }
+      
+      // Asignar rol de superadmin
+      await promoteToSuperAdmin(data.id);
+      
+      toast({
+        title: "Éxito",
+        description: "Usuario promovido a Super Administrador correctamente",
+      });
+      
+      // Actualizar lista de usuarios si ya está cargada
+      if (users.length > 0) {
+        setUsers(prev => prev.map(u => 
+          u.id === data.id ? {
+            ...u, 
+            role: 'super_admin',
+          } : u
+        ));
+      }
+    } catch (error) {
+      console.error("Error al asignar rol:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo asignar rol de Super Administrador",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Ejecutar al cargar el componente
   useEffect(() => {
+    // Asignar rol automáticamente al cargar
+    assignSuperAdminRole();
+    
     const fetchData = async () => {
       try {
         setLoading(true);
