@@ -7,7 +7,7 @@ export interface User {
   email: string;
   department: string;
   approver_id?: string;
-  role?: string; // Añadido para compatibilidad con el rol de administrador
+  role?: string;
 }
 
 export interface LeaveBalance {
@@ -99,8 +99,7 @@ export const getAllTeamRequests = async (): Promise<any[]> => {
     .select(`
       *,
       profiles:user_id (name, department)
-    `)
-    .order('start_date', { ascending: true });
+    `);
     
   if (error) {
     console.error('Error al obtener solicitudes del equipo:', error);
@@ -235,7 +234,7 @@ export const updateLeaveRequestStatus = async (id: string, status: 'approved' | 
     .update({ 
       status,
       comments,
-      approved_by: profile?.name || 'Supervisor' // En un sistema real, esto sería el nombre del aprobador
+      approved_by: profile?.name || 'Supervisor'
     })
     .eq('id', id)
     .select()
