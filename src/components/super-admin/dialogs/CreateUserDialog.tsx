@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,12 +16,12 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 import { 
   User, 
   updateUserLeaveBalance,
   assignApprover,
   createUser,
-  getAllUsers
 } from "@/services/adminService";
 
 interface CreateUserDialogProps {
@@ -29,6 +29,7 @@ interface CreateUserDialogProps {
   setIsOpen: (open: boolean) => void;
   users: User[];
   setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+  onUserCreated?: () => Promise<void>;
 }
 
 // Schema for create user form
@@ -46,8 +47,15 @@ const createUserSchema = z.object({
 
 type CreateUserValues = z.infer<typeof createUserSchema>;
 
-const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDialogProps) => {
+const CreateUserDialog = ({ 
+  isOpen, 
+  setIsOpen, 
+  users, 
+  setUsers, 
+  onUserCreated 
+}: CreateUserDialogProps) => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Available departments
   const departments = [
@@ -104,7 +112,10 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
 
   // Handle form submission
   const onSubmit = async (data: CreateUserValues) => {
+    setIsSubmitting(true);
     try {
+      console.log("Iniciando creación de usuario:", data.email);
+      
       const userId = await createUser(
         data.email,
         data.password,
@@ -113,37 +124,48 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
         data.role
       );
       
-      if (userId) {
-        // Update leave balance
-        await updateUserLeaveBalance(userId, {
-          vacation_days: data.vacationDays,
-          sick_days: data.sickDays,
-          personal_days: data.personalDays,
-        });
-        
-        // Assign approver if defined
-        if (data.approver) {
-          await assignApprover(userId, data.approver);
-        }
-        
-        toast({
-          title: "Éxito",
-          description: "Usuario creado correctamente",
-        });
-        
-        // Reload users
-        const usersData = await getAllUsers();
-        setUsers(usersData);
-        
-        setIsOpen(false);
+      if (!userId) {
+        throw new Error("No se pudo crear el usuario");
       }
+
+      console.log("Usuario creado con ID:", userId);
+      
+      // Update leave balance
+      await updateUserLeaveBalance(userId, {
+        vacation_days: data.vacationDays,
+        sick_days: data.sickDays,
+        personal_days: data.personalDays,
+      });
+      
+      console.log("Balance de días actualizado");
+      
+      // Assign approver if defined
+      if (data.approver) {
+        await assignApprover(userId, data.approver);
+        console.log("Aprobador asignado");
+      }
+      
+      toast({
+        title: "Éxito",
+        description: "Usuario creado correctamente",
+      });
+      
+      // Refresh data
+      if (onUserCreated) {
+        await onUserCreated();
+      }
+      
+      setIsOpen(false);
+      
     } catch (error) {
       console.error("Error al crear usuario:", error);
       toast({
         title: "Error",
-        description: "No se pudo crear el usuario",
+        description: error instanceof Error ? error.message : "No se pudo crear el usuario",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -166,7 +188,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                   <FormItem>
                     <FormLabel>Nombre</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} disabled={isSubmitting} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -179,7 +201,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} disabled={isSubmitting} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -193,7 +215,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                 <FormItem>
                   <FormLabel>Contraseña</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type="password" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -206,7 +228,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                 <FormItem>
                   <FormLabel>Departamento</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecciona un departamento" />
                       </SelectTrigger>
@@ -229,7 +251,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                   <FormItem>
                     <FormLabel>Días Vacaciones</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input type="number" {...field} disabled={isSubmitting} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -242,7 +264,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                   <FormItem>
                     <FormLabel>Días Enfermedad</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input type="number" {...field} disabled={isSubmitting} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -255,7 +277,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                   <FormItem>
                     <FormLabel>Días Personales</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input type="number" {...field} disabled={isSubmitting} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -269,7 +291,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                 <FormItem>
                   <FormLabel>Aprobador</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
                       <SelectTrigger>
                         <SelectValue placeholder="Asignar aprobador" />
                       </SelectTrigger>
@@ -293,7 +315,7 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
                 <FormItem>
                   <FormLabel>Rol</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isSubmitting}>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar rol" />
                       </SelectTrigger>
@@ -311,8 +333,15 @@ const CreateUserDialog = ({ isOpen, setIsOpen, users, setUsers }: CreateUserDial
               )}
             />
             <DialogFooter>
-              <Button type="submit">
-                Crear Usuario
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creando...
+                  </>
+                ) : (
+                  "Crear Usuario"
+                )}
               </Button>
             </DialogFooter>
           </form>

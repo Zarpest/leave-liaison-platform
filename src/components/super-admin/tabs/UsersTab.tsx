@@ -21,9 +21,17 @@ interface UsersTabProps {
   leaveBalances: {[key: string]: LeaveBalance};
   setLeaveBalances: React.Dispatch<React.SetStateAction<{[key: string]: LeaveBalance}>>;
   loading: boolean;
+  onRefreshData?: () => Promise<void>;
 }
 
-const UsersTab = ({ users, setUsers, leaveBalances, setLeaveBalances, loading }: UsersTabProps) => {
+const UsersTab = ({ 
+  users, 
+  setUsers, 
+  leaveBalances, 
+  setLeaveBalances, 
+  loading, 
+  onRefreshData 
+}: UsersTabProps) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -49,8 +57,10 @@ const UsersTab = ({ users, setUsers, leaveBalances, setLeaveBalances, loading }:
     setIsCreateDialogOpen(true);
   };
 
-  const handlePromoteToSuperAdmin = async (userId: string) => {
-    // This will be handled by UsersTable component
+  const handleUserCreated = async () => {
+    if (onRefreshData) {
+      await onRefreshData();
+    }
   };
 
   return (
@@ -69,7 +79,10 @@ const UsersTab = ({ users, setUsers, leaveBalances, setLeaveBalances, loading }:
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="py-10 text-center">Cargando usuarios...</div>
+          <div className="py-10 text-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+            <p>Cargando usuarios...</p>
+          </div>
         ) : (
           <UsersTable
             users={users}
@@ -97,6 +110,7 @@ const UsersTab = ({ users, setUsers, leaveBalances, setLeaveBalances, loading }:
         setIsOpen={setIsCreateDialogOpen}
         users={users}
         setUsers={setUsers}
+        onUserCreated={handleUserCreated}
       />
 
       {/* Password Dialog */}

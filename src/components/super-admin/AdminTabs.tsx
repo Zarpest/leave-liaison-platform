@@ -19,6 +19,7 @@ interface AdminTabsProps {
   setLeaveBalances: React.Dispatch<React.SetStateAction<{[key: string]: LeaveBalance}>>;
   leaveRequests: LeaveRequest[];
   loading: boolean;
+  onRefreshData?: () => Promise<void>;
 }
 
 const AdminTabs = ({ 
@@ -27,7 +28,8 @@ const AdminTabs = ({
   leaveBalances, 
   setLeaveBalances, 
   leaveRequests, 
-  loading 
+  loading,
+  onRefreshData
 }: AdminTabsProps) => {
   return (
     <Tabs defaultValue="users" className="w-full">
@@ -52,7 +54,8 @@ const AdminTabs = ({
           setUsers={setUsers} 
           leaveBalances={leaveBalances} 
           setLeaveBalances={setLeaveBalances} 
-          loading={loading} 
+          loading={loading}
+          onRefreshData={onRefreshData}
         />
       </TabsContent>
 
