@@ -26,7 +26,7 @@ export interface LeaveRequest {
   end_date: string;
   days: number;
   status: 'pending' | 'approved' | 'rejected';
-  requested_on: string;
+  created_at: string;
   approved_by?: string;
   comments?: string;
   approver_id?: string;
@@ -82,7 +82,7 @@ export const getUserLeaveRequests = async (): Promise<LeaveRequest[]> => {
     .from('leave_requests')
     .select('*')
     .eq('user_id', user.id)
-    .order('requested_on', { ascending: false });
+    .order('created_at', { ascending: false });
     
   if (error) {
     console.error('Error al obtener solicitudes:', error);
@@ -94,34 +94,44 @@ export const getUserLeaveRequests = async (): Promise<LeaveRequest[]> => {
 
 // Obtener todas las solicitudes de permiso del equipo (para el calendario compartido)
 export const getAllTeamRequests = async (): Promise<any[]> => {
-  const { data, error } = await supabase
+  const { data: requests, error } = await supabase
     .from('leave_requests')
-    .select(`
-      *,
-      profiles:user_id (name, department)
-    `);
+    .select('*');
     
   if (error) {
     console.error('Error al obtener solicitudes del equipo:', error);
     return [];
   }
   
+  // Get all profiles separately
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, name, department');
+  
+  const profileMap = (profiles || []).reduce((acc, p) => {
+    acc[p.id] = p;
+    return acc;
+  }, {} as Record<string, any>);
+  
   // Formatear los datos para que sean más fáciles de usar
-  return (data || []).map(item => ({
-    id: item.id,
-    user_id: item.user_id,
-    username: item.profiles?.name || 'Usuario desconocido',
-    department: item.profiles?.department || null,
-    type: item.type,
-    start_date: item.start_date,
-    end_date: item.end_date,
-    days: item.days,
-    status: item.status,
-    requested_on: item.requested_on,
-    approved_by: item.approved_by,
-    comments: item.comments,
-    approver_id: item.approver_id
-  }));
+  return (requests || []).map(item => {
+    const profile = profileMap[item.user_id];
+    return {
+      id: item.id,
+      user_id: item.user_id,
+      username: profile?.name || 'Usuario desconocido',
+      department: profile?.department || null,
+      type: item.type,
+      start_date: item.start_date,
+      end_date: item.end_date,
+      days: item.days,
+      status: item.status,
+      created_at: item.created_at,
+      approved_by: item.approved_by,
+      comments: item.comments,
+      approver_id: item.approver_id
+    };
+  });
 };
 
 // Obtener una solicitud de permiso específica
@@ -141,7 +151,7 @@ export const getLeaveRequestById = async (id: string): Promise<LeaveRequest | nu
 };
 
 // Crear una nueva solicitud de permiso
-export const createLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'user_id' | 'requested_on' | 'status'> & { approver_id?: string }): Promise<LeaveRequest | null> => {
+export const createLeaveRequest = async (request: Omit<LeaveRequest, 'id' | 'user_id' | 'created_at' | 'status'> & { approver_id?: string }): Promise<LeaveRequest | null> => {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) return null;
@@ -185,36 +195,46 @@ export const getPendingRequestsForApprover = async (): Promise<any[]> => {
   
   if (!user) return [];
   
-  const { data, error } = await supabase
+  const { data: requests, error } = await supabase
     .from('leave_requests')
-    .select(`
-      *,
-      profiles:user_id (name, email, department)
-    `)
+    .select('*')
     .eq('approver_id', user.id)
     .eq('status', 'pending')
-    .order('requested_on', { ascending: false });
+    .order('created_at', { ascending: false });
     
   if (error) {
     console.error('Error al obtener solicitudes pendientes:', error);
     return [];
   }
   
-  return (data || []).map(item => ({
-    id: item.id,
-    user_id: item.user_id,
-    userName: item.profiles?.name || 'Usuario desconocido',
-    userEmail: item.profiles?.email || '',
-    department: item.profiles?.department || '',
-    type: item.type,
-    start_date: item.start_date,
-    end_date: item.end_date,
-    days: item.days,
-    status: item.status,
-    requested_on: item.requested_on,
-    comments: item.comments,
-    approver_id: item.approver_id
-  }));
+  // Get all profiles separately
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, name, email, department');
+  
+  const profileMap = (profiles || []).reduce((acc, p) => {
+    acc[p.id] = p;
+    return acc;
+  }, {} as Record<string, any>);
+  
+  return (requests || []).map(item => {
+    const profile = profileMap[item.user_id];
+    return {
+      id: item.id,
+      user_id: item.user_id,
+      userName: profile?.name || 'Usuario desconocido',
+      userEmail: profile?.email || '',
+      department: profile?.department || '',
+      type: item.type,
+      start_date: item.start_date,
+      end_date: item.end_date,
+      days: item.days,
+      status: item.status,
+      created_at: item.created_at,
+      comments: item.comments,
+      approver_id: item.approver_id
+    };
+  });
 };
 
 // Actualizar el estado de una solicitud

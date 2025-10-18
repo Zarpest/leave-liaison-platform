@@ -157,7 +157,7 @@ const Requests = () => {
                               <StatusBadge status={request.status} />
                             </TableCell>
                             <TableCell>
-                              {formatDate(request.requested_on)}
+                              {formatDate(request.created_at)}
                             </TableCell>
                             <TableCell className="text-right">
                               <Button

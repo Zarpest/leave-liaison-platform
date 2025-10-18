@@ -165,7 +165,7 @@ const Approvals = () => {
                           </TableCell>
                           <TableCell className="text-center">{request.days}</TableCell>
                           <TableCell>
-                            {formatDate(request.requested_on)}
+                            {formatDate(request.created_at)}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">

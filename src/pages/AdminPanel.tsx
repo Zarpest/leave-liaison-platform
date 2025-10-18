@@ -412,7 +412,7 @@ const AdminPanel = () => {
                                     </span>
                                   </TableCell>
                                   <TableCell>{request.approved_by || "Pendiente"}</TableCell>
-                                  <TableCell>{new Date(request.requested_on).toLocaleDateString()}</TableCell>
+                                  <TableCell>{new Date(request.created_at).toLocaleDateString()}</TableCell>
                                 </TableRow>
                               );
                             })

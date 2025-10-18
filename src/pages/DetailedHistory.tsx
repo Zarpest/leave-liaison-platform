@@ -153,7 +153,7 @@ const DetailedHistory = () => {
                 <div>
                   <CardTitle className="text-2xl">{request.type}</CardTitle>
                   <CardDescription>
-                    Solicitud #{request.id} - Creada el {formatDate(request.requested_on, "d 'de' MMMM 'de' yyyy")}
+                    Solicitud #{request.id} - Creada el {formatDate(request.created_at, "d 'de' MMMM 'de' yyyy")}
                   </CardDescription>
                 </div>
                 <StatusBadge status={request.status} className="mt-2 sm:mt-0" />

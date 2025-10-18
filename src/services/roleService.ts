@@ -8,29 +8,61 @@ export const isSuperAdmin = async (): Promise<boolean> => {
   if (!user) return false;
   
   const { data, error } = await supabase
-    .from('profiles')
+    .from('user_roles')
     .select('role')
-    .eq('id', user.id)
-    .single();
+    .eq('user_id', user.id)
+    .eq('role', 'super_admin')
+    .maybeSingle();
     
-  if (error || !data) {
+  if (error) {
     console.error('Error checking role:', error);
     return false;
   }
   
-  return data.role === 'super_admin';
+  return !!data;
+};
+
+// Get user roles
+export const getUserRoles = async (userId: string): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId);
+    
+  if (error) {
+    console.error('Error getting user roles:', error);
+    return [];
+  }
+  
+  return data.map(r => r.role);
 };
 
 // Set user role
 export const setUserRole = async (userId: string, role: string): Promise<void> => {
-  const { error } = await supabase
-    .from('profiles')
-    .update({ role })
-    .eq('id', userId);
+  // Validate role
+  const validRoles = ['user', 'admin', 'super_admin'];
+  if (!validRoles.includes(role)) {
+    throw new Error(`Invalid role: ${role}`);
+  }
+  
+  // First check if the role exists
+  const { data: existingRole } = await supabase
+    .from('user_roles')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('role', role as any)
+    .maybeSingle();
     
-  if (error) {
-    console.error('Error updating role:', error);
-    throw error;
+  // If it doesn't exist, insert it (cast to any to bypass type checking)
+  if (!existingRole) {
+    const { error } = await supabase
+      .from('user_roles')
+      .insert({ user_id: userId, role: role as any });
+      
+    if (error) {
+      console.error('Error setting role:', error);
+      throw error;
+    }
   }
 };
 
@@ -42,7 +74,7 @@ export const promoteToSuperAdmin = async (userId: string): Promise<void> => {
 // Check if any super admin exists
 export const checkSuperAdminExists = async (): Promise<boolean> => {
   const { data, error } = await supabase
-    .from('profiles')
+    .from('user_roles')
     .select('id')
     .eq('role', 'super_admin')
     .limit(1);

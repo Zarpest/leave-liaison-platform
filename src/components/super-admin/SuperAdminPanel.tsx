@@ -11,8 +11,6 @@ import {
   LeaveBalance,
   LeaveRequest,
 } from "@/services/adminService";
-import { promoteToSuperAdmin } from "@/services/roleService";
-import { supabase } from "@/integrations/supabase/client";
 
 const SuperAdminPanel = () => {
   const { toast } = useToast();
@@ -21,56 +19,6 @@ const SuperAdminPanel = () => {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [initializing, setInitializing] = useState(true);
-
-  // Lista de emails que deben ser superadministradores
-  const superAdminEmails = [
-    'turedseguraprotejeres@gmail.com',
-    'joexdsonrie@gmail.com'
-  ];
-
-  // Asignar superadmin a los usuarios especificados (solo una vez)
-  const assignSuperAdminRoles = async () => {
-    try {
-      console.log("Verificando roles de superadmin...");
-      
-      for (const email of superAdminEmails) {
-        // Buscar el usuario por correo
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, email, role')
-          .eq('email', email)
-          .maybeSingle();
-        
-        if (error) {
-          console.error(`Error buscando usuario ${email}:`, error);
-          continue;
-        }
-        
-        if (!data) {
-          console.log(`Usuario ${email} no encontrado en la base de datos`);
-          continue;
-        }
-        
-        if (data.role === 'super_admin') {
-          console.log(`Usuario ${email} ya tiene rol de Super Administrador`);
-          continue;
-        }
-        
-        // Asignar rol de superadmin
-        console.log(`Promoviendo usuario ${email} a Super Administrador...`);
-        await promoteToSuperAdmin(data.id);
-        
-        console.log(`Usuario ${email} promovido exitosamente`);
-        
-        toast({
-          title: "Éxito",
-          description: `Usuario ${email} promovido a Super Administrador`,
-        });
-      }
-    } catch (error) {
-      console.error("Error al verificar/asignar roles:", error);
-    }
-  };
 
   // Cargar datos principales
   const fetchData = async () => {
@@ -112,10 +60,7 @@ const SuperAdminPanel = () => {
         setInitializing(true);
         setLoading(true);
         
-        // Verificar/asignar roles primero
-        await assignSuperAdminRoles();
-        
-        // Luego cargar los datos
+        // Cargar los datos
         await fetchData();
         
       } catch (error) {

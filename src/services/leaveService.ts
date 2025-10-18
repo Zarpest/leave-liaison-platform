@@ -10,7 +10,7 @@ export interface LeaveRequest {
   end_date: string;
   days: number;
   status: 'pending' | 'approved' | 'rejected';
-  requested_on: string;
+  created_at: string;
   approved_by?: string;
   comments?: string;
   approver_id?: string;
@@ -41,7 +41,7 @@ export const getLeaveRequests = async (): Promise<LeaveRequest[]> => {
   const { data, error } = await supabase
     .from('leave_requests')
     .select('*')
-    .order('requested_on', { ascending: false });
+    .order('created_at', { ascending: false });
     
   if (error) {
     console.error('Error getting leave requests:', error);

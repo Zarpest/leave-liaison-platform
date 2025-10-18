@@ -120,7 +120,7 @@ const LeaveHistory = () => {
                             <StatusBadge status={request.status} />
                           </TableCell>
                           <TableCell className="text-right">
-                            {formatDate(request.requested_on)}
+                            {formatDate(request.created_at)}
                           </TableCell>
                           <TableCell>
                             <Button 

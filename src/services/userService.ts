@@ -42,6 +42,15 @@ export const getAllUsers = async (): Promise<User[]> => {
     throw balancesError;
   }
   
+  // Get user roles
+  const { data: userRoles, error: rolesError } = await supabase
+    .from('user_roles')
+    .select('user_id, role');
+    
+  if (rolesError) {
+    console.error('Error fetching user roles:', rolesError);
+  }
+  
   // Create a map of balances by user id
   const balanceMap: Record<string, LeaveBalance> = {};
   balances.forEach(balance => {
@@ -54,6 +63,14 @@ export const getAllUsers = async (): Promise<User[]> => {
     userNameMap[profile.id] = profile.name;
   });
   
+  // Create a map of user roles (get the highest role)
+  const roleMap: Record<string, string> = {};
+  userRoles?.forEach(ur => {
+    if (!roleMap[ur.user_id] || ur.role === 'super_admin') {
+      roleMap[ur.user_id] = ur.role;
+    }
+  });
+  
   // Combine profiles with their balances and approver names
   const users: User[] = profiles.map(profile => ({
     id: profile.id,
@@ -63,7 +80,7 @@ export const getAllUsers = async (): Promise<User[]> => {
     leave_balance: balanceMap[profile.id],
     approver_id: profile.approver_id,
     approver: profile.approver_id ? userNameMap[profile.approver_id] : undefined,
-    role: profile.role
+    role: roleMap[profile.id] || 'user'
   }));
   
   return users;
